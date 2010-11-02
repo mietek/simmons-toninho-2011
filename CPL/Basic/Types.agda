@@ -6,7 +6,7 @@ open import Compat
 open import Accessibility.Inductive
 import Accessibility.IndexedList as IndexedList
 
-module CleanModal.Types (UWF : UpwardsWellFounded) where 
+module Accessibility.Types (UWF : UpwardsWellFounded) where 
 
   open SuccStar UWF
   open IndexedList UWF
