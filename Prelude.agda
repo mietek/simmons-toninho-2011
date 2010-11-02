@@ -13,3 +13,7 @@ module Prelude where
   {- Equality -}
   open import Lib.Id public
   open import Lib.Nat public
+
+  {- Data structures -}
+  open import Lib.List public
+  open import Lib.PiList public 

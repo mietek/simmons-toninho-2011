@@ -34,6 +34,14 @@ module PreludeTest where
   h : (n m p : NatT) → (n +n (m +n p)) ≡ ((m +n n) +n p)
   h n m p = Nat.assoc-plus {n}{m}{p} ≡≡ Nat.plus-cong1 (g n m)
 
-  i : (A B : Set) → A + B → B + A
+  i : {A B : Set} → A + B → B + A
   i (Inl x) = Inr x
   i (Inr x) = Inl x
+
+  append : List.List Nat.Nat → List.List Nat.Nat → List.List Nat.Nat
+  append [] ys = ys
+  append (x :: xs) ys = x :: append xs ys
+
+  inapp : ∀{x} (xs ys : ListT NatT) → x ∈ ys → x ∈ append xs ys
+  inapp [] ys n = n
+  inapp (x :: xs) ys n = S (inapp xs ys n)
