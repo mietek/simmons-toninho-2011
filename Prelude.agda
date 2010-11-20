@@ -1,5 +1,3 @@
-
-
 module Prelude where
 
   open import Lib.Level public
@@ -12,8 +10,17 @@ module Prelude where
 
   {- Equality -}
   open import Lib.Id public
-  open import Lib.Nat public
 
-  {- Data structures -}
+  {- Non-value-carrying datatypes -}
+  open import Lib.Bool public
+  open import Lib.Nat public
+  open import Lib.String public
+
+  {- Functors -}
+  open import Lib.Membership public
+
+  {- Value-carrying datatypes -}
+  open import Lib.Maybe public
   open import Lib.List public
-  open import Lib.PiList public 
+  -- open import Lib.PiList public 
+
