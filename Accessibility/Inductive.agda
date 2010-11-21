@@ -20,7 +20,6 @@ record UpwardsWellFounded : Set1 where
 -- particular, TRANS-UWF.TransUWF Rel is the transitive closure of Rel.
 
 module TRANS-UWF (UWF : UpwardsWellFounded) where
-  
    open UpwardsWellFounded UWF public
 
    -- Transitive closure 
