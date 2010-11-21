@@ -1,6 +1,8 @@
--- KS4⁻ Sequent Calculus
 -- A Constructive Logic of Provability
+-- The minimal, modal, propositional fragment
 -- Robert J. Simmons, Bernardo Toninho
+
+-- Soundness and completeness of the sequent calculus.
 
 -- Uncomment this to make the file load faster:
 -- {-# OPTIONS --no-termination-check #-}
@@ -138,7 +140,6 @@ module SEQUENT (UWF : UpwardsWellFounded) where
       ¬◇L' iN _ (λ ω D₀ → snd 
        (→m refl (D ω (λ D' → D₀ (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
 
-
    -- Weakening (inside the metric)
    wk' : ∀{Γ' Γ Δ A w s} 
       → Γ ⊆ Γ' to w
@@ -157,8 +158,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    wk' sub (¬□L' iN s D) = ¬□L' (⊆to/now sub iN) _ (λ D₀ → wk' sub (D D₀))
    wk' sub (¬◇R' ω D) = ¬◇R' ω D
    wk' sub (¬◇L' iN s D) = ¬◇L' (⊆to/now sub iN) _ (λ ω D₀ → wk' sub (D ω D₀))
-  
- 
+   
    -- Admissibility of cut (tethered)
    cut' : ∀{Γ Δ w A s₁ s₂ C} 
       → Seq w Γ Δ s₁ A
@@ -198,7 +198,6 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    cut D E = 
       m→ (⊆to/↓ _) (snd (cut' (snd (→m refl D)) (snd (→m extend↓ E))))
 
-  
    -- The identity theorem
    iden : ∀{w Γ}(A : _) → A at w :: Γ ⇒ A [ w ]
    iden (a N) = hyp Z
