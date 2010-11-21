@@ -6,13 +6,11 @@
 {-# OPTIONS --no-positivity-check #-}
 
 module MinimalCPL.Core where
-
 open import Prelude
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
 
 module CORE (UWF : UpwardsWellFounded) where 
-
    open UpwardsWellFounded UWF
    open ILIST UWF
 
