@@ -1,8 +1,12 @@
 -- A Constructive Logic of Provability
--- The minimal, propositional fragment
+-- The minimal, modal, propositional fragment
 -- Robert J. Simmons, Bernardo Toninho
 
--- Necessary; no hope for Agda's positivity checker to work here
+-- Propositions and their meaning, plus the core metric.
+
+-- Turning off the positivity check is necessary; there is no hope for Agda's 
+-- positivity checker to work here, and only the upwards-well-foundedness of
+-- the accessibility relation preserves the consistency of Agda.
 {-# OPTIONS --no-positivity-check #-}
 
 module MinimalCPL.Core where
@@ -28,15 +32,11 @@ module CORE (UWF : UpwardsWellFounded) where
    Ctx = List Type
    MCtx = IList Type
 
-   infix 10 _,_[_]
-   _,_[_] : MCtx → Type → W → MCtx
-   Δ , A [ w ] = (A at w) :: Δ
-
    -- Natural deduction without a metric
    infix 1 _⊢_[_]
    data _⊢_[_] : MCtx → Type → W → Set where
       hyp : ∀{A Γ w}
-         → (A at w ∈ Γ)
+         → A at w ∈ Γ
          → Γ ⊢ A [ w ]
       ⊃I : ∀{Γ A B w}
          → A at w :: Γ ⊢ B [ w ]
@@ -83,12 +83,12 @@ module CORE (UWF : UpwardsWellFounded) where
          → a Q at w ∈ Γ
          → Γ ⇒ a Q [ w ]
       ⊃R : ∀{Γ A B w}
-         → (A at w) :: Γ ⇒ B [ w ]
+         → A at w :: Γ ⇒ B [ w ]
          → Γ ⇒ A ⊃ B [ w ]
       ⊃L : ∀{Γ A B C w}
          → (A ⊃ B) at w ∈ Γ  
          → Γ ⇒ A [ w ]
-         → (B at w) :: Γ ⇒ C [ w ]
+         → B at w :: Γ ⇒ C [ w ]
          → Γ ⇒ C [ w ]
       □R : ∀{Γ A w}
          → (∀{w'} → w ≺ w' → Γ ⇒ A [ w' ]) 
@@ -121,8 +121,9 @@ module CORE (UWF : UpwardsWellFounded) where
          → (∀{w'} → w ≺ w' → (Γ ⇒ A [ w' ] → ⊥) → Γ ⇒ C [ w ])
          → Γ ⇒ C [ w ]
 
-
    -- Core metric
+   -- The metric could be split, one for the sequent calculus and one for the 
+   -- natural deduction system, but there's no real reason to do so
    data Shape (Δ : MCtx) (w : W) : Set where
       s0 : Shape Δ w
       s1 : Shape Δ w → Shape Δ w
