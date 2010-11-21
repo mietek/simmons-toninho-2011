@@ -23,7 +23,7 @@ data Type : Set where
    a   : (N : String) → Type
    _⊃_ : (A B : Type) → Type
    ◇   : (A : Type) → Type
-
+ 
 -- Not well-founded, so we'll have to roll our own indexed lists
 data Item : Set where
    _at_ : Type → W → Item 
