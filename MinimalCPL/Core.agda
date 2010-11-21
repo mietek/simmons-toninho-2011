@@ -21,7 +21,7 @@ module CORE (UWF : UpwardsWellFounded) where
    -- Types/Propositions
    infixr 10 _⊃_
    data Type : Set where
-      a   : (N : Nat) → Type
+      a   : (N : String) → Type
       _⊃_ : (A B : Type) → Type
       □   : (A : Type) → Type
       ◇   : (A : Type) → Type
