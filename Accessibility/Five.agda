@@ -148,6 +148,6 @@ module WIDE where
       ind = ind}
      
    WideTrans : UpwardsWellFounded
-   WideTrans = TRANS-UWF.TransUWF Wide
+   WideTrans = TRANS-UWF.TransUWF Wide 
 
 open WIDE public using (Wide ; WideTrans)
