@@ -1,5 +1,5 @@
 -- Lists where each item is indexed at a particular world, and various notions
--- of "subset" between worlds.
+-- of "subset" between lists.
 
 module Accessibility.IndexedList where
 
@@ -8,7 +8,7 @@ open import Accessibility.Inductive
 
 module ILIST (UWF : UpwardsWellFounded) where 
 
-    open SuccStar UWF
+    open TRANS-UWF UWF
 
     data Item (A : Set) : Set where
        _at_ : A → W → Item A

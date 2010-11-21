@@ -147,9 +147,7 @@ module WIDE where
       _≡?_ = _≡?_;
       ind = ind}
      
-   open UWF-TRANS Wide
-
    WideTrans : UpwardsWellFounded
-   WideTrans = TransUWF
+   WideTrans = TRANS-UWF.TransUWF Wide
 
 open WIDE public using (Wide ; WideTrans)

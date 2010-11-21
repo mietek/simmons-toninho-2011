@@ -17,10 +17,9 @@ record UpwardsWellFounded : Set1 where
 
 -- Given an upwards well-founded accessibility relation Rel, its transitive 
 -- closure is also an upwards well-founded accessibility relation. In 
--- particular, if we "open UWF-TRANS Rel," then TransUWF is the transitive
--- closure of Rel.
+-- particular, TRANS-UWF.TransUWF Rel is the transitive closure of Rel.
 
-module UWF-TRANS (UWF : UpwardsWellFounded) where
+module TRANS-UWF (UWF : UpwardsWellFounded) where
   
    open UpwardsWellFounded UWF public
 
