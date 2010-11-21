@@ -91,6 +91,10 @@ module TRANS-UWF (UWF : UpwardsWellFounded) where
    ≺+⊀ ω ≺*≡ = nrefl+ _ _ refl ω
    ≺+⊀ ω (≺*+ ω') = nsym+ _ _ ω ω'
 
+   ≺+⊀trans : ∀{w₁ w₂ w₃} → w₁ ≺+ w₂ → w₁ ⊀ w₃ → w₂ ⊀ w₃
+   ≺+⊀trans ω nω ≺*≡ = nω (≺*+ ω)
+   ≺+⊀trans ω nω (≺*+ ω') = nω (≺*+ (≺+trans ω ω'))
+
    TransUWF : UpwardsWellFounded
    TransUWF = record
      {W = W

@@ -2,7 +2,7 @@
 -- The minimal, modal, propositional fragment
 -- Robert J. Simmons, Bernardo Toninho
 
--- Propositions and their meaning, plus the core metric.
+-- Propositions and their meaning, plus the core metric
 
 -- Turning off the positivity check is necessary; there is no hope for Agda's 
 -- positivity checker to work here, and only the upwards-well-foundedness of
