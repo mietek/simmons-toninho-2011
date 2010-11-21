@@ -1,4 +1,4 @@
--- A Constructive Logic of Provability
+-- Constructive Provability Logic 
 -- The minimal, modal, propositional fragment
 -- Robert J. Simmons, Bernardo Toninho
 
