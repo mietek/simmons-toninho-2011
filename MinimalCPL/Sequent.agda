@@ -2,7 +2,7 @@
 -- The minimal, modal, propositional fragment
 -- Robert J. Simmons, Bernardo Toninho
 
--- Soundness and completeness of the sequent calculus.
+-- Soundness and completeness of the sequent calculus
 
 -- Uncomment this to make the file load faster:
 -- {-# OPTIONS --no-termination-check #-}
