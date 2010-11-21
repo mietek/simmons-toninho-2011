@@ -79,7 +79,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
          → (∀{w'} (ω : w ≺ w') (D₀ : Δ ⊢ A [ w' ]) → ND w Γ Δ (s ω D₀) C)
          → ND w Γ Δ (s2 s₀ (s◇⊢ s)) C
       ¬□I' : ∀{w A Γ Δ}
-         → (∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → ⊥) 
+         → (∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) 
          → ND w Γ Δ s0 (¬□ A) 
       ¬□E' : ∀{w A Γ Δ C s₀}
          → ND w Γ Δ s₀ (¬□ A)
@@ -88,7 +88,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
          → ND w Γ Δ (s2 s₀ (s¬□⊢ s)) C
       ¬◇I' : ∀{Γ Δ A w w'}
          → w ≺ w'
-         → (Δ ⊢ A [ w' ] → ⊥)
+         → (Δ ⊢ A [ w' ] → Void)
          → ND w Γ Δ s0 (¬◇ A)
       ¬◇E' : ∀{Γ Δ A C w s₀}
          → ND w Γ Δ s₀ (¬◇ A)
