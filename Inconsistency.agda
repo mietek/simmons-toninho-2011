@@ -67,3 +67,7 @@ it's-false (◇E D₁ D₂) with only-provable-thing D₁
 -- Anything you want, you've got it (ex falso quodlibet).
 uh-oh : (A : Set) → A
 uh-oh = abort (it's-false it's-true)
+
+-- Just one example
+0=1 : 0 ≡ 1
+0=1 = uh-oh (0 ≡ 1)
