@@ -70,3 +70,32 @@ module CORE (UWF : UpwardsWellFounded) where
             (LIST.case-cons (λ w0 → (w0 ∈ succ') + (Γ ⊢ A [ w0 ])) 
              (Inr D') Inl)
             Inr))
+
+module EXAMPLE where
+   open import Accessibility.Five
+   open UpwardsWellFounded Arbitrary
+   open CORE (Arbitrary)
+
+   -- Local completeness at δ 
+   -- We use δ instead of ω in the tech report because ω is the metavariable
+   -- we use to represet proofs about the accessibility relation.
+   lcδ : ∀{Γ A} → Γ ⊢ □ A [ δ ] → Γ ⊢ □ A [ δ ]
+   lcδ {Γ} {A} D = □I lemma
+    where 
+      lemma : ∀{w'} → δ ≺ w' → Γ ⊢ A [ w' ]
+      lemma ()
+
+   -- Local completeness at α
+   lcα : ∀{Γ A} → Γ ⊢ □ A [ α ] → Γ ⊢ □ A [ α ]
+   lcα {Γ} {A} D = □E' D succβ (λ D₁ → □E' D succδ (λ D₂ → □I (lemma D₁ D₂)))
+    where
+      succβ : α ≺ β
+      succβ = Z
+
+      succδ : α ≺ δ
+      succδ = S Z
+
+      lemma : Γ ⊢ A [ β ] → Γ ⊢ A [ δ ] → ∀{w'} → α ≺ w' → Γ ⊢ A [ w' ]
+      lemma D₁ D₂ Z = D₁
+      lemma D₁ D₂ (S Z) = D₂
+      lemma D₁ D₂ (S (S ()))
