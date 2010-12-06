@@ -76,6 +76,14 @@ module CORE (UWF : UpwardsWellFounded) where
          → (∀{w'} → w ≺ w' → (Γ ⊢ A [ w' ] → Void) → Γ ⊢ C [ w ])
          → Γ ⊢ C [ w ]
 
+   -- The alternate, "more natural" □E rule is derivable
+   □E' : ∀{Γ A C w w'} 
+      → Γ ⊢ □ A [ w ]
+      → w ≺ w' 
+      → (Γ ⊢ A [ w' ] → Γ ⊢ C [ w ])
+      → Γ ⊢ C [ w ] 
+   □E' D ω D' = □E D (λ D'' → D' (D'' ω))
+
    -- Sequent calculus without a metric
    infix 1 _⇒_[_]
    data _⇒_[_] : MCtx → Type → W → Set where
