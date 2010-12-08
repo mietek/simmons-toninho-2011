@@ -71,3 +71,9 @@ uh-oh = abort (it's-false it's-true)
 -- Just one example
 0=1 : 0 ≡ 1
 0=1 = uh-oh (0 ≡ 1)
+
+3=4 : 3 ≡ 4
+3=4 = NAT.s-cong (NAT.s-cong (NAT.s-cong (uh-oh (0 ≡ 1))))
+
+2+2=5 : 2 +n 2 ≡ 5
+2+2=5 = uh-oh (2 +n 2 ≡ 5)
