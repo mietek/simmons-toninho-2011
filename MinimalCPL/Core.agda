@@ -14,19 +14,19 @@ open import Prelude
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
 
+-- Types/Propositions
+infixr 10 _⊃_
+data Type : Set where
+   a   : (N : String) → Type
+   _⊃_ : (A B : Type) → Type
+   ◇   : (A : Type) → Type
+   □   : (A : Type) → Type
+   ¬◇  : (A : Type) → Type
+   ¬□  : (A : Type) → Type
+
 module CORE (UWF : UpwardsWellFounded) where 
    open UpwardsWellFounded UWF
    open ILIST UWF
-
-   -- Types/Propositions
-   infixr 10 _⊃_
-   data Type : Set where
-      a   : (N : String) → Type
-      _⊃_ : (A B : Type) → Type
-      □   : (A : Type) → Type
-      ◇   : (A : Type) → Type
-      ¬□  : (A : Type) → Type
-      ¬◇  : (A : Type) → Type
 
    -- Contexts
    Ctx = List Type
@@ -45,13 +45,6 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⊢ A ⊃ B [ w ]
          → Γ ⊢ A [ w ]
          → Γ ⊢ B [ w ]
-      □I : ∀{Γ A w}
-         → (∀{w'} → w ≺ w' → Γ ⊢ A [ w' ])
-         → Γ ⊢ □ A [ w ]
-      □E : ∀{Γ A C w}
-         → Γ ⊢ □ A [ w ]
-         → ((∀{w'} → w ≺ w' → Γ ⊢ A [ w' ]) → Γ ⊢ C [ w ])
-         → Γ ⊢ C [ w ]
       ◇I : ∀{Γ A w w'}
          → w ≺ w'
          → Γ ⊢ A [ w' ]
@@ -60,19 +53,26 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⊢ ◇ A [ w ] 
          → (∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Γ ⊢ C [ w ])
          → Γ ⊢ C [ w ]
-      ¬□I : ∀{Γ A w}
-         → (∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Void)
-         → Γ ⊢ ¬□ A [ w ]
-      ¬□E : ∀{Γ A C w}
-         → Γ ⊢ ¬□ A [ w ]
-         → ((∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Void) → Γ ⊢ C [ w ])
+      □I : ∀{Γ A w}
+         → (∀{w'} → w ≺ w' → Γ ⊢ A [ w' ])
+         → Γ ⊢ □ A [ w ]
+      □E : ∀{Γ A C w}
+         → Γ ⊢ □ A [ w ]
+         → ((∀{w'} → w ≺ w' → Γ ⊢ A [ w' ]) → Γ ⊢ C [ w ])
          → Γ ⊢ C [ w ]
-      ¬◇I : ∀{Γ A w w'}
-         → w ≺ w'
-         → (Γ ⊢ A [ w' ] → Void)
+      ¬◇I : ∀{Γ A w}
+         → (∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Void)
          → Γ ⊢ ¬◇ A [ w ]
       ¬◇E : ∀{Γ A C w}
-         → Γ ⊢ ¬◇ A [ w ] 
+         → Γ ⊢ ¬◇ A [ w ]
+         → ((∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Void) → Γ ⊢ C [ w ])
+         → Γ ⊢ C [ w ]
+      ¬□I : ∀{Γ A w w'}
+         → w ≺ w'
+         → (Γ ⊢ A [ w' ] → Void)
+         → Γ ⊢ ¬□ A [ w ]
+      ¬□E : ∀{Γ A C w}
+         → Γ ⊢ ¬□ A [ w ] 
          → (∀{w'} → w ≺ w' → (Γ ⊢ A [ w' ] → Void) → Γ ⊢ C [ w ])
          → Γ ⊢ C [ w ]
 
@@ -98,13 +98,6 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⇒ A [ w ]
          → B at w :: Γ ⇒ C [ w ]
          → Γ ⇒ C [ w ]
-      □R : ∀{Γ A w}
-         → (∀{w'} → w ≺ w' → Γ ⇒ A [ w' ]) 
-         → Γ ⇒ □ A [ w ]
-      □L : ∀{Γ A C w}
-         → (□ A) at w ∈ Γ
-         → ((∀{w'} → w ≺ w' → Γ ⇒ A [ w' ]) → Γ ⇒ C [ w ])
-         → Γ ⇒ C [ w ]
       ◇R : ∀{Γ A w w'}
          → w ≺ w'
          → Γ ⇒ A [ w' ]
@@ -113,19 +106,26 @@ module CORE (UWF : UpwardsWellFounded) where
          → (◇ A) at w ∈ Γ
          → (∀{w'} → w ≺ w' → Γ ⇒ A [ w' ] → Γ ⇒ C [ w ])
          → Γ ⇒ C [ w ]
-      ¬□R : ∀{Γ A w}
+      □R : ∀{Γ A w}
+         → (∀{w'} → w ≺ w' → Γ ⇒ A [ w' ]) 
+         → Γ ⇒ □ A [ w ]
+      □L : ∀{Γ A C w}
+         → (□ A) at w ∈ Γ
+         → ((∀{w'} → w ≺ w' → Γ ⇒ A [ w' ]) → Γ ⇒ C [ w ])
+         → Γ ⇒ C [ w ]
+      ¬◇R : ∀{Γ A w}
          → (∀{w'} → w ≺ w' → Γ ⇒ A [ w' ] → Void)
-         → Γ ⇒ ¬□ A [ w ]
-      ¬□L : ∀{Γ A C w}
-         → (¬□ A) at w ∈ Γ
+         → Γ ⇒ ¬◇ A [ w ]
+      ¬◇L : ∀{Γ A C w}
+         → (¬◇ A) at w ∈ Γ
          → ((∀{w'} → w ≺ w' → Γ ⇒ A [ w' ] → Void) → Γ ⇒ C [ w ])
          → Γ ⇒ C [ w ]
-      ¬◇R : ∀{Γ A w w'}
+      ¬□R : ∀{Γ A w w'}
          → w ≺ w'
          → (Γ ⇒ A [ w' ] → Void)
-         → Γ ⇒ ¬◇ A [ w ] 
-      ¬◇L : ∀{Γ A w C}
-         → (¬◇ A) at w ∈ Γ
+         → Γ ⇒ ¬□ A [ w ] 
+      ¬□L : ∀{Γ A w C}
+         → (¬□ A) at w ∈ Γ
          → (∀{w'} → w ≺ w' → (Γ ⇒ A [ w' ] → Void) → Γ ⇒ C [ w ])
          → Γ ⇒ C [ w ]
 
@@ -137,19 +137,19 @@ module CORE (UWF : UpwardsWellFounded) where
       s1 : Shape Δ w → Shape Δ w
       s2 : Shape Δ w → Shape Δ w → Shape Δ w 
       s3 : Shape Δ w → Shape Δ w → Shape Δ w → Shape Δ w
-      s□⇒ : ∀{A} 
-          → ((∀{w'} → w ≺ w' → Δ ⇒ A [ w' ]) → Shape Δ w) → Shape Δ w
-      s□⊢ : ∀{A} 
-          → ((∀{w'} → w ≺ w' → Δ ⊢ A [ w' ]) → Shape Δ w) → Shape Δ w
       s◇⇒ : ∀{A}
           → (∀{w'} → w ≺ w' → Δ ⇒ A [ w' ] → Shape Δ w) → Shape Δ w
       s◇⊢ : ∀{A} 
           → (∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Shape Δ w) → Shape Δ w
-      s¬□⇒ : ∀{A} 
-          → ((∀{w'} → w ≺ w' → Δ ⇒ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
-      s¬□⊢ : ∀{A} 
-          → ((∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
+      s□⇒ : ∀{A} 
+          → ((∀{w'} → w ≺ w' → Δ ⇒ A [ w' ]) → Shape Δ w) → Shape Δ w
+      s□⊢ : ∀{A} 
+          → ((∀{w'} → w ≺ w' → Δ ⊢ A [ w' ]) → Shape Δ w) → Shape Δ w
       s¬◇⇒ : ∀{A} 
-          → (∀{w'} → w ≺ w' → (Δ ⇒ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
+          → ((∀{w'} → w ≺ w' → Δ ⇒ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
       s¬◇⊢ : ∀{A} 
+          → ((∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
+      s¬□⇒ : ∀{A} 
+          → (∀{w'} → w ≺ w' → (Δ ⇒ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
+      s¬□⊢ : ∀{A} 
           → (∀{w'} → w ≺ w' → (Δ ⊢ A [ w' ] → Void) → Shape Δ w) → Shape Δ w

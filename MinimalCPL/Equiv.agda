@@ -42,25 +42,25 @@ module EQUIV (UWF : UpwardsWellFounded) where
       cut (nd→seq' w ih D')
        (cut (wk-seq wken (nd→seq' w ih D))
         (⊃L Z (iden' _ (S Z)) (iden _)))
-   nd→seq' w ih (□I D) = □R (λ ω → fst (ih _ ω) (D ω))
-   nd→seq' w ih (□E D D') = 
-      cut (nd→seq' w ih D)
-       (□L Z (λ D₀ → wk-seq wken (nd→seq' w ih 
-        (D' (λ ω → snd (ih _ ω) (wk-seq (wkto ω) (D₀ ω)))))))
    nd→seq' w ih (◇I ω D) = ◇R ω (fst (ih _ ω) D)
    nd→seq' w ih (◇E D D') = 
       cut (nd→seq' w ih D) 
        (◇L Z (λ ω D₀ → wk-seq wken (nd→seq' w ih 
         (D' ω (snd (ih _ ω) (wk-seq (wkto ω) D₀))))))
-   nd→seq' w ih (¬□I D) = ¬□R (λ ω D₀ → D ω (snd (ih _ ω) D₀))
-   nd→seq' w ih (¬□E D D') = 
-      cut (nd→seq' w ih D) 
-       (¬□L Z (λ D₀ → wk-seq wken (nd→seq' w ih 
-        (D' (λ ω D'' → D₀ ω (fst (ih _ ω) (wk-nd (wkto' ω) D'')))))))
-   nd→seq' w ih (¬◇I ω D') = ¬◇R ω (λ D₀ → D' (snd (ih _ ω) D₀))
-   nd→seq' w ih (¬◇E D D') = 
+   nd→seq' w ih (□I D) = □R (λ ω → fst (ih _ ω) (D ω))
+   nd→seq' w ih (□E D D') = 
       cut (nd→seq' w ih D)
-       (¬◇L Z (λ ω D₀ → wk-seq wken (nd→seq' w ih 
+       (□L Z (λ D₀ → wk-seq wken (nd→seq' w ih 
+        (D' (λ ω → snd (ih _ ω) (wk-seq (wkto ω) (D₀ ω)))))))
+   nd→seq' w ih (¬◇I D) = ¬◇R (λ ω D₀ → D ω (snd (ih _ ω) D₀))
+   nd→seq' w ih (¬◇E D D') = 
+      cut (nd→seq' w ih D) 
+       (¬◇L Z (λ D₀ → wk-seq wken (nd→seq' w ih 
+        (D' (λ ω D'' → D₀ ω (fst (ih _ ω) (wk-nd (wkto' ω) D'')))))))
+   nd→seq' w ih (¬□I ω D') = ¬□R ω (λ D₀ → D' (snd (ih _ ω) D₀))
+   nd→seq' w ih (¬□E D D') = 
+      cut (nd→seq' w ih D)
+       (¬□L Z (λ ω D₀ → wk-seq wken (nd→seq' w ih 
         (D' ω (λ D'' → D₀ (fst (ih _ ω) (wk-nd (wkto' ω) D'')))))))
 
    -- Given the induction hypothesis, sequent implies natural deduction
@@ -70,18 +70,18 @@ module EQUIV (UWF : UpwardsWellFounded) where
    seq→nd' w ih (⊃R D) = ⊃I (seq→nd' w ih D)
    seq→nd' w ih (⊃L iN D D') = 
       subst (⊃E (hyp iN) (seq→nd' w ih D)) (seq→nd' w ih D')
-   seq→nd' w ih (□R D) = □I (λ ω → snd (ih _ ω) (D ω))
-   seq→nd' w ih (□L iN D) = 
-      □E (hyp iN) (λ D₀ → seq→nd' w ih (D (λ ω → fst (ih _ ω) (D₀ ω))))
    seq→nd' w ih (◇R ω D) = ◇I ω (snd (ih _ ω) D)
    seq→nd' w ih (◇L iN D) = 
       ◇E (hyp iN) (λ ω D₀ → seq→nd' w ih (D ω (fst (ih _ ω) D₀)))
-   seq→nd' w ih (¬□R D) = ¬□I (λ ω D₀ → D ω (fst (ih _ ω) D₀))
-   seq→nd' w ih (¬□L iN D) = 
-      ¬□E (hyp iN) (λ D₀ → seq→nd' w ih (D (λ ω D' → D₀ ω (snd (ih _ ω) D'))))
-   seq→nd' w ih (¬◇R ω D) = ¬◇I ω (λ D₀ → D (fst (ih _ ω) D₀))
+   seq→nd' w ih (□R D) = □I (λ ω → snd (ih _ ω) (D ω))
+   seq→nd' w ih (□L iN D) = 
+      □E (hyp iN) (λ D₀ → seq→nd' w ih (D (λ ω → fst (ih _ ω) (D₀ ω))))
+   seq→nd' w ih (¬◇R D) = ¬◇I (λ ω D₀ → D ω (fst (ih _ ω) D₀))
    seq→nd' w ih (¬◇L iN D) = 
-      ¬◇E (hyp iN) (λ ω D₀ → seq→nd' w ih (D ω (λ D' → D₀ (snd (ih _ ω) D'))))
+      ¬◇E (hyp iN) (λ D₀ → seq→nd' w ih (D (λ ω D' → D₀ ω (snd (ih _ ω) D'))))
+   seq→nd' w ih (¬□R ω D) = ¬□I ω (λ D₀ → D (fst (ih _ ω) D₀))
+   seq→nd' w ih (¬□L iN D) = 
+      ¬□E (hyp iN) (λ ω D₀ → seq→nd' w ih (D ω (λ D' → D₀ (snd (ih _ ω) D'))))
 
    -- Therefore, both sequent calculus and natural deduction are equivalent
    nd⇆seq : (w : W) → 
