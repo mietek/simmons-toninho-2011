@@ -77,12 +77,12 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⊢ C [ w ]
 
    -- The alternate, "more natural" □E rule is derivable
-   □E' : ∀{Γ A C w w'} 
+   □E-alt : ∀{Γ A C w w'} 
       → Γ ⊢ □ A [ w ]
       → w ≺ w' 
       → (Γ ⊢ A [ w' ] → Γ ⊢ C [ w ])
       → Γ ⊢ C [ w ] 
-   □E' D ω D' = □E D (λ D'' → D' (D'' ω))
+   □E-alt D ω D' = □E D (λ D'' → D' (D'' ω))
 
    -- Sequent calculus without a metric
    infix 1 _⇒_[_]
