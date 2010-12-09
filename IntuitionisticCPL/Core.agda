@@ -9,8 +9,8 @@
 -- the accessibility relation preserves the consistency of Agda.
 {-# OPTIONS --no-positivity-check #-}
 
-module MinimalCPL.Core where
-open import Prelude
+module IntuitionisticCPL.Core where
+open import Prelude hiding (⊥)
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
 
@@ -18,6 +18,7 @@ open import Accessibility.IndexedList
 infixr 10 _⊃_
 data Type : Set where
    a   : (N : String) → Type
+   ⊥   : Type
    _⊃_ : (A B : Type) → Type
    ◇   : (A : Type) → Type
    □   : (A : Type) → Type
@@ -44,6 +45,9 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⊢ A ⊃ B [ w ]
          → Γ ⊢ A [ w ]
          → Γ ⊢ B [ w ]
+      ⊥E : ∀{Γ C w} 
+         → Γ ⊢ ⊥ [ w ]
+         → Γ ⊢ C [ w ] 
       ◇I : ∀{Γ A w w'}
          → w ≺ w'
          → Γ ⊢ A [ w' ]
@@ -97,6 +101,9 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⇒ A [ w ]
          → B at w :: Γ ⇒ C [ w ]
          → Γ ⇒ C [ w ]
+      ⊥E : ∀{Γ C w} 
+         → Γ ⇒ ⊥ [ w ]
+         → Γ ⇒ C [ w ] 
       ◇R : ∀{Γ A w w'}
          → w ≺ w'
          → Γ ⇒ A [ w' ]
