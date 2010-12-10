@@ -101,8 +101,8 @@ module CORE (UWF : UpwardsWellFounded) where
          → Γ ⇒ A [ w ]
          → B at w :: Γ ⇒ C [ w ]
          → Γ ⇒ C [ w ]
-      ⊥E : ∀{Γ C w} 
-         → Γ ⇒ ⊥ [ w ]
+      ⊥L : ∀{Γ C w} 
+         → ⊥ at w ∈ Γ
          → Γ ⇒ C [ w ] 
       ◇R : ∀{Γ A w w'}
          → w ≺ w'

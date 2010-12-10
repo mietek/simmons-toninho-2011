@@ -4,13 +4,13 @@
 
 -- Equivalence of sequent calculus and natural deduction
 
-module MinimalCPL.Equiv where
+module IntuitionisticCPL.Equiv where
 open import Prelude
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
-open import MinimalCPL.Core
-open import MinimalCPL.NatDeduction
-open import MinimalCPL.Sequent
+open import IntuitionisticCPL.Core
+open import IntuitionisticCPL.NatDeduction
+open import IntuitionisticCPL.Sequent
 
 module EQUIV (UWF : UpwardsWellFounded) where
    open TRANS-UWF UWF
@@ -42,6 +42,7 @@ module EQUIV (UWF : UpwardsWellFounded) where
       cut (nd→seq' w ih D')
        (cut (wk-seq wken (nd→seq' w ih D))
         (⊃L Z (iden' _ (S Z)) (iden _)))
+   nd→seq' w ih (⊥E D) = cut (nd→seq' w ih D) (⊥L Z)
    nd→seq' w ih (◇I ω D) = ◇R ω (fst (ih _ ω) D)
    nd→seq' w ih (◇E D D') = 
       cut (nd→seq' w ih D) 
@@ -70,6 +71,7 @@ module EQUIV (UWF : UpwardsWellFounded) where
    seq→nd' w ih (⊃R D) = ⊃I (seq→nd' w ih D)
    seq→nd' w ih (⊃L iN D D') = 
       subst (⊃E (hyp iN) (seq→nd' w ih D)) (seq→nd' w ih D')
+   seq→nd' w ih (⊥L iN) = ⊥E (hyp iN)
    seq→nd' w ih (◇R ω D) = ◇I ω (snd (ih _ ω) D)
    seq→nd' w ih (◇L iN D) = 
       ◇E (hyp iN) (λ ω D₀ → seq→nd' w ih (D ω (fst (ih _ ω) D₀)))

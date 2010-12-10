@@ -7,11 +7,11 @@
 -- Uncomment this to make the file load faster:
 -- {-# OPTIONS --no-termination-check #-}
 
-module MinimalCPL.Sequent where
-open import Prelude
+module IntuitionisticCPL.Sequent where
+open import Prelude hiding (⊥)
 open import Accessibility.Inductive 
 open import Accessibility.IndexedList
-open import MinimalCPL.Core 
+open import IntuitionisticCPL.Core 
 
 module SEQUENT (UWF : UpwardsWellFounded) where
    open TRANS-UWF UWF
@@ -27,6 +27,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    wk₁ w ih sub (⊃R D) = ⊃R (wk₁ w ih (⊆to/both sub) D)
    wk₁ w ih sub (⊃L iN D D') = 
       ⊃L (⊆to/now sub iN) (wk₁ w ih sub D) (wk₁ w ih (⊆to/both sub) D')
+   wk₁ w ih sub (⊥L iN) = ⊥L (⊆to/now sub iN)
    wk₁ w ih sub (◇R ω D) = ◇R ω (ih _ ω (⊆to/≺ (≺+0 ω) sub) D)
    wk₁ w ih sub (◇L iN D) = 
       ◇L (⊆to/now sub iN)
@@ -65,6 +66,9 @@ module SEQUENT (UWF : UpwardsWellFounded) where
          → Seq w Γ Δ s₁ A 
          → Seq w (B at w :: Γ) Δ s₂ C
          → Seq w Γ Δ (s2 s₁ s₂) C
+      ⊥L' : ∀{w C Γ Δ} 
+         → ⊥ at w ∈ Γ
+         → Seq w Γ Δ s0 C
       ◇R' : ∀{w Γ Δ w' A}
          → w ≺ w'
          → Δ ⇒ A [ w' ]
@@ -106,6 +110,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    m→ sub (hyp' iN) = hyp iN
    m→ sub (⊃R' D) = ⊃R (m→ (⊆to/wken sub) D)
    m→ sub (⊃L' iN D D') = ⊃L iN (m→ sub D) (m→ (⊆to/wken sub) D')
+   m→ sub (⊥L' iN) = ⊥L iN
    m→ sub (◇R' ω D) = ◇R ω (wk (⊆to/≺ (≺+0 ω) sub) D)
    m→ sub (◇L' ω s D) = 
       ◇L ω (λ ω D₀ → m→ sub (D ω (wk (⊆to/≺' (≺+0 ω) sub) D₀)))
@@ -123,6 +128,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    →m Refl (hyp iN) = , hyp' iN
    →m Refl (⊃R D) = , ⊃R' (snd (→m extend↓ D))
    →m Refl (⊃L iN D D') = , ⊃L' iN (snd (→m refl D)) (snd (→m extend↓ D'))
+   →m Refl (⊥L iN) = , ⊥L' iN
    →m Refl (◇R ω D) = , ◇R' ω (wk (⊆to/↓≺ _ (≺+0 ω)) D)
    →m {Γ} Refl (◇L iN D) = , 
       ◇L' iN _ 
@@ -149,6 +155,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    wk' sub (⊃R' D) = ⊃R' (wk' (⊆to/both sub) D)
    wk' sub (⊃L' iN D D') = 
       ⊃L' (⊆to/now sub iN) (wk' sub D) (wk' (⊆to/both sub) D')
+   wk' sub (⊥L' iN) = ⊥L' (⊆to/now sub iN)
    wk' sub (◇R' ω D) = ◇R' ω D
    wk' sub (◇L' iN s D) = ◇L' (⊆to/now sub iN) _ (λ ω D₀ → wk' sub (D ω D₀))
    wk' sub (□R' D) = □R' D
@@ -175,6 +182,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
 
    -- Left commutative cuts
    cut' (⊃L' iN DA D) E = , ⊃L' iN DA (snd (cut' D (wk' wkex E)))
+   cut' (⊥L' iN) E = , ⊥L' iN
    cut' (◇L' iN s D) E = , ◇L' iN _ (λ ω D₀ → snd (cut' (D ω D₀) E))
    cut' (□L' iN s D) E = , □L' iN _ (λ D₀ → snd (cut' (D D₀) E))
    cut' (¬◇L' iN s D) E = , ¬◇L' iN _ (λ D₀ → snd (cut' (D D₀) E))
@@ -182,6 +190,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
 
    -- Right commutative cuts
    cut' D (hyp' (S iN)) = , hyp' iN
+   cut' D (⊥L' (S iN)) = , ⊥L' iN
    cut' D (⊃R' E) = , ⊃R' (snd (cut' (wk' wken D) (wk' exch E)))
    cut' D (⊃L' (S iN) EA E) = , 
       ⊃L' iN (snd (cut' D EA)) (snd (cut' (wk' wken D) (wk' exch E)))
@@ -202,6 +211,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    iden : ∀{w Γ}(A : _) → A at w :: Γ ⇒ A [ w ]
    iden (a N) = hyp Z
    iden (A ⊃ B) = ⊃R (⊃L (S Z) (iden A) (iden B))
+   iden ⊥ = ⊥L Z
    iden (◇ A) = ◇L Z ◇R
    iden (□ A) = □L Z □R
    iden (¬◇ A) = ¬◇L Z ¬◇R
@@ -210,6 +220,7 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    iden' : ∀{w Γ}(A : _) → (A at w) ∈ Γ → Γ ⇒ A [ w ]
    iden' (a N) iN = hyp iN
    iden' (A ⊃ B) iN = ⊃R (⊃L (S iN) (iden A) (iden B))
+   iden' ⊥ iN = ⊥L iN
    iden' (◇ A) iN = ◇L iN ◇R
    iden' (□ A) iN = □L iN □R
    iden' (¬◇ A) iN = ¬◇L iN ¬◇R
