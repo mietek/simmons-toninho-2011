@@ -4,11 +4,11 @@
 
 -- Natural deduction and substitution
 
-module MinimalCPL.NatDeduction where
-open import Prelude
+module IntuitionisticCPL.NatDeduction where
+open import Prelude hiding (⊥)
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
-open import MinimalCPL.Core
+open import IntuitionisticCPL.Core
 
 module NAT-DEDUCTION (UWF : UpwardsWellFounded) where 
    open TRANS-UWF UWF
@@ -23,6 +23,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    wk₁ w ih sub (hyp iN) = hyp (⊆to/now sub iN)
    wk₁ w ih sub (⊃I D) = ⊃I (wk₁ w ih (⊆to/both sub) D)
    wk₁ w ih sub (⊃E D₁ D₂) = ⊃E (wk₁ w ih sub D₁) (wk₁ w ih sub D₂)
+   wk₁ w ih sub (⊥E D) = ⊥E (wk₁ w ih sub D)
    wk₁ w ih sub (◇I ω D) = ◇I ω (ih _ ω (⊆to/≺ (≺+0 ω) sub) D)
    wk₁ w ih sub (◇E D D') = 
       ◇E (wk₁ w ih sub D) 
@@ -61,6 +62,9 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
          → ND w Γ Δ s₁ (A ⊃ B) 
          → ND w Γ Δ s₂ A
          → ND w Γ Δ (s2 s₁ s₂) B
+      ⊥E' : ∀{w C Γ Δ s}
+         → ND w Γ Δ s ⊥
+         → ND w Γ Δ (s1 s) C
       ◇I' : ∀{Γ Δ A w w'}
          → w ≺ w'
          → Δ ⊢ A [ w' ]
@@ -102,6 +106,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    m→ sub (hyp' iN) = hyp iN
    m→ sub (⊃I' D) = ⊃I (m→ (⊆to/wken sub) D)
    m→ sub (⊃E' DA D) = ⊃E (m→ sub DA) (m→ sub D)
+   m→ sub (⊥E' D) = ⊥E (m→ sub D)
    m→ sub (◇I' ω D) = ◇I ω (wk (⊆to/≺ (≺+0 ω) sub) D)
    m→ sub (◇E' DA s D) = 
       ◇E (m→ sub DA) (λ ω D₀ → m→ sub (D ω (wk (⊆to/≺' (≺+0 ω) sub) D₀)))
@@ -123,6 +128,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    →m {Γ} Refl (⊃I D) = , ⊃I' (snd (→m extend↓ D))
    →m Refl (⊃E D₁ D₂) = , 
       ⊃E' (snd (→m refl D₁)) (snd (→m refl D₂)) 
+   →m Refl (⊥E D) = , ⊥E' (snd (→m refl D))
    →m Refl (◇I ω D) = , ◇I' ω (wk (⊆to/↓≺ _ (≺+0 ω)) D)
    →m Refl (◇E D₁ D₂) = ,
       ◇E' (snd (→m refl D₁)) _ 
@@ -148,6 +154,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    wk' sub (hyp' iN) = hyp' (⊆to/now sub iN)
    wk' sub (⊃I' D) = ⊃I' (wk' (⊆to/both sub) D)
    wk' sub (⊃E' D₁ D₂) = ⊃E' (wk' sub D₁) (wk' sub D₂)
+   wk' sub (⊥E' D) = ⊥E' (wk' sub D)
    wk' sub (◇I' ω D) = ◇I' ω D
    wk' sub (◇E' D₁ s D₂) = ◇E' (wk' sub D₁) s (λ ω D₀ → wk' sub (D₂ ω D₀)) 
    wk' sub (□I' D) = □I' D
@@ -166,6 +173,7 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    subst' D (hyp' (S iN)) = , hyp' iN
    subst' D (⊃I' D₁) = , ⊃I' (snd (subst' (wk' wken D) (wk' exch D₁)))
    subst' D (⊃E' D₁ D₂) = , ⊃E' (snd (subst' D D₁)) (snd (subst' D D₂))
+   subst' D (⊥E' D₁) = , ⊥E' (snd (subst' D D₁))
    subst' D (◇I' ω D₁) = , ◇I' ω D₁
    subst' D (◇E' D₁ s D₂) = ,
       ◇E' (snd (subst' D D₁)) _ (λ ω D₀ → snd (subst' D (D₂ ω D₀))) 
