@@ -27,24 +27,22 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    wk₁ w ih sub (⊃R D) = ⊃R (wk₁ w ih (⊆to/both sub) D)
    wk₁ w ih sub (⊃L iN D D') = 
       ⊃L (⊆to/now sub iN) (wk₁ w ih sub D) (wk₁ w ih (⊆to/both sub) D')
-   wk₁ w ih sub (◇R ω D) = ◇R ω (ih _ ω (⊆to/≺ (≺+0 ω) sub) D)
+   wk₁ w ih sub (◇R ω D) = ◇R ω (ih _ ω (⊆to/≺ ω sub) D)
    wk₁ w ih sub (◇L iN D) = 
       ◇L (⊆to/now sub iN)
-       (λ ω D₀ → wk₁ w ih sub (D ω (ih _ ω (⊆to/≺' (≺+0 ω) sub) D₀)))
-   wk₁ w ih sub (□R D) = □R (λ ω → ih _ ω (⊆to/≺ (≺+0 ω) sub) (D ω))
+       (λ ω D₀ → wk₁ w ih sub (D ω (ih _ ω (⊆to/≺' ω sub) D₀)))
+   wk₁ w ih sub (□R D) = □R (λ ω → ih _ ω (⊆to/≺ ω sub) (D ω))
    wk₁ w ih sub (□L iN D) = 
       □L (⊆to/now sub iN) 
-       (λ D₀ → wk₁ w ih sub (D (λ ω → ih _ ω (⊆to/≺' (≺+0 ω) sub) (D₀ ω))))
-   wk₁ w ih sub (¬◇R D) = ¬◇R (λ ω D₀ → D ω (ih _ ω (⊆to/≺' (≺+0 ω) sub) D₀))
+       (λ D₀ → wk₁ w ih sub (D (λ ω → ih _ ω (⊆to/≺' ω sub) (D₀ ω))))
+   wk₁ w ih sub (¬◇R D) = ¬◇R (λ ω D₀ → D ω (ih _ ω (⊆to/≺' ω sub) D₀))
    wk₁ w ih sub (¬◇L iN D) = 
       ¬◇L (⊆to/now sub iN) 
-       (λ D₀ → wk₁ w ih sub 
-        (D (λ ω D' → D₀ ω (ih _ ω (⊆to/≺ (≺+0 ω) sub) D'))))
-   wk₁ w ih sub (¬□R ω D) = ¬□R ω (λ D₀ → D (ih _ ω (⊆to/≺' (≺+0 ω) sub) D₀))
+       (λ D₀ → wk₁ w ih sub (D (λ ω D' → D₀ ω (ih _ ω (⊆to/≺ ω sub) D'))))
+   wk₁ w ih sub (¬□R ω D) = ¬□R ω (λ D₀ → D (ih _ ω (⊆to/≺' ω sub) D₀))
    wk₁ w ih sub (¬□L iN D) = 
       ¬□L (⊆to/now sub iN) 
-       (λ ω D₀ → wk₁ w ih sub 
-        (D ω (λ D' → D₀ (ih _ ω (⊆to/≺ (≺+0 ω) sub) D'))))
+       (λ ω D₀ → wk₁ w ih sub (D ω (λ D' → D₀ (ih _ ω (⊆to/≺ ω sub) D'))))
  
    wk : ∀{Γ Γ' w A}
       → Γ ⊆ Γ' to w
@@ -106,18 +104,18 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    m→ sub (hyp' iN) = hyp iN
    m→ sub (⊃R' D) = ⊃R (m→ (⊆to/wken sub) D)
    m→ sub (⊃L' iN D D') = ⊃L iN (m→ sub D) (m→ (⊆to/wken sub) D')
-   m→ sub (◇R' ω D) = ◇R ω (wk (⊆to/≺ (≺+0 ω) sub) D)
+   m→ sub (◇R' ω D) = ◇R ω (wk (⊆to/≺ ω sub) D)
    m→ sub (◇L' ω s D) = 
-      ◇L ω (λ ω D₀ → m→ sub (D ω (wk (⊆to/≺' (≺+0 ω) sub) D₀)))
-   m→ sub (□R' D) = □R (λ ω → wk (⊆to/≺ (≺+0 ω) sub) (D ω))
+      ◇L ω (λ ω D₀ → m→ sub (D ω (wk (⊆to/≺' ω sub) D₀)))
+   m→ sub (□R' D) = □R (λ ω → wk (⊆to/≺ ω sub) (D ω))
    m→ sub (□L' iN s D) = 
-      □L iN (λ D₀ → m→ sub (D (λ ω → wk (⊆to/≺' (≺+0 ω) sub) (D₀ ω))))
-   m→ sub (¬◇R' D) = ¬◇R (λ ω D₀ → D ω (wk (⊆to/≺' (≺+0 ω) sub) D₀))
+      □L iN (λ D₀ → m→ sub (D (λ ω → wk (⊆to/≺' ω sub) (D₀ ω))))
+   m→ sub (¬◇R' D) = ¬◇R (λ ω D₀ → D ω (wk (⊆to/≺' ω sub) D₀))
    m→ sub (¬◇L' iN s D) =
-      ¬◇L iN (λ D₀ → m→ sub (D (λ ω D' → D₀ ω (wk (⊆to/≺ (≺+0 ω) sub) D'))))
-   m→ sub (¬□R' ω D) = ¬□R ω (λ D₀ → D (wk (⊆to/≺' (≺+0 ω) sub) D₀))
+      ¬◇L iN (λ D₀ → m→ sub (D (λ ω D' → D₀ ω (wk (⊆to/≺ ω sub) D'))))
+   m→ sub (¬□R' ω D) = ¬□R ω (λ D₀ → D (wk (⊆to/≺' ω sub) D₀))
    m→ sub (¬□L' ω s D) = 
-      ¬□L ω (λ ω D₀ → m→ sub (D ω (λ D' → D₀ (wk (⊆to/≺ (≺+0 ω) sub) D'))))
+      ¬□L ω (λ ω D₀ → m→ sub (D ω (λ D' → D₀ (wk (⊆to/≺ ω sub) D'))))
 
    →m : ∀{Γ w Δ A} → (Γ ↓ w) ≡ Δ → Γ ⇒ A [ w ] → ∃ λ s → Seq w Γ Δ s A
    →m Refl (hyp iN) = , hyp' iN
@@ -126,16 +124,16 @@ module SEQUENT (UWF : UpwardsWellFounded) where
    →m Refl (◇R ω D) = , ◇R' ω (wk (⊆to/↓≺ _ (≺+0 ω)) D)
    →m {Γ} Refl (◇L iN D) = , 
       ◇L' iN _ 
-       (λ ω D₀ → snd (→m refl (D ω (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D₀))))
+       (λ ω D₀ → snd (→m refl (D ω (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))))
    →m {Γ} Refl (□R D) = , □R' (λ ω → wk (⊆to/↓≺ Γ (≺+0 ω)) (D ω))
    →m {Γ} Refl (□L iN D) = ,
       □L' iN _ 
-       (λ D₀ → snd (→m refl (D (λ ω → wk (⊆to/≺ (≺+0 ω) (⊆to/↓ Γ)) (D₀ ω)))))
-   →m Refl (¬◇R D) = , ¬◇R' (λ ω D₀ → D ω (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D₀))
+       (λ D₀ → snd (→m refl (D (λ ω → wk (⊆to/≺ ω (⊆to/↓ Γ)) (D₀ ω)))))
+   →m Refl (¬◇R D) = , ¬◇R' (λ ω D₀ → D ω (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))
    →m Refl (¬◇L iN D) = ,
       ¬◇L' iN _ (λ D₀ → snd
        (→m refl (D (λ ω D' → D₀ ω (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
-   →m Refl (¬□R ω D) = , ¬□R' ω (λ D₀ → D (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D₀))
+   →m Refl (¬□R ω D) = , ¬□R' ω (λ D₀ → D (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))
    →m Refl (¬□L iN D) = ,
       ¬□L' iN _ (λ ω D₀ → snd 
        (→m refl (D ω (λ D' → D₀ (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
