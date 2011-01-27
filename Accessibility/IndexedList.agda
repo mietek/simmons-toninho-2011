@@ -10,8 +10,12 @@ module ILIST (UWF : UpwardsWellFounded) where
 
    open TRANS-UWF UWF
 
-   data Item (A : Set) : Set where
-      _at_ : A → W → Item A
+   record Item (A : Set) : Set where
+      constructor _at_ 
+      field
+         prjx : A
+         prjw : W
+   open Item public
 
    IList : Set → Set
    IList A = List (Item A)
@@ -102,6 +106,14 @@ module ILIST (UWF : UpwardsWellFounded) where
       → (x at w') ∈ Γ
    ⊆to/later ω (st sub sub≺) iN = ⊆at/later ω sub iN
 
+   ⊆to* : ∀{A w w' Δ Γ}{x : A} 
+      → w ≺* w' 
+      → Δ ⊆ Γ to w 
+      → (x at w') ∈ Δ 
+      → (x at w') ∈ Γ
+   ⊆to* ≺*≡ = ⊆to/now
+   ⊆to* (≺*+ ω) = ⊆to/later ω
+
    ⊆to/later' : ∀{A w w' Δ Γ}{x : A} 
       → w ≺+ w' 
       → Δ ⊆ Γ to w 
@@ -112,11 +124,21 @@ module ILIST (UWF : UpwardsWellFounded) where
    ... | Inr ¬ω = abort (¬ω ≺*≡)
 
    -- Introduction forms
-   ⊆to/≺ : ∀{A w w'}{Δ Γ : IList A} → w ≺+ w' → Δ ⊆ Γ to w → Δ ⊆ Γ to w'
-   ⊆to/≺ ω (st sub sub≺) = st (⊆at/≺+ ω sub) (λ ω' → sub≺ (≺+trans ω ω')) 
+   ⊆to/≺ : ∀{A w w'}{Δ Γ : IList A} → w ≺ w' → Δ ⊆ Γ to w → Δ ⊆ Γ to w'
+   ⊆to/≺ ω (st sub sub≺) = st (⊆at/≺ ω sub) (λ ω' → sub≺ (≺+S ω ω')) 
 
-   ⊆to/≺' : ∀{A w w'}{Δ Γ : IList A} → w ≺+ w' → Δ ⊆ Γ to w → Γ ⊆ Δ to w'
-   ⊆to/≺' ω (st sub sub≺) = st (sub≺ ω) (λ ω' → ⊆at/≺+ (≺+trans ω ω') sub)
+   ⊆to/≺' : ∀{A w w'}{Δ Γ : IList A} → w ≺ w' → Δ ⊆ Γ to w → Γ ⊆ Δ to w'
+   ⊆to/≺' ω (st sub sub≺) = st (sub≺ (≺+0 ω)) (λ ω' → ⊆at/≺+ (≺+S ω ω') sub)
+
+   ⊆to/≺+ : ∀{A w w'}{Δ Γ : IList A} → w ≺+ w' → Δ ⊆ Γ to w → Δ ⊆ Γ to w'
+   ⊆to/≺+ ω (st sub sub≺) = st (⊆at/≺+ ω sub) (λ ω' → sub≺ (≺+trans ω ω')) 
+
+   ⊆to/≺+' : ∀{A w w'}{Δ Γ : IList A} → w ≺+ w' → Δ ⊆ Γ to w → Γ ⊆ Δ to w'
+   ⊆to/≺+' ω (st sub sub≺) = st (sub≺ ω) (λ ω' → ⊆at/≺+ (≺+trans ω ω') sub)
+
+   ⊆to/≺* : ∀{A w w'}{Δ Γ : IList A} → w ≺* w' → Δ ⊆ Γ to w → Δ ⊆ Γ to w'
+   ⊆to/≺* ≺*≡ = λ x → x
+   ⊆to/≺* (≺*+ ω) = ⊆to/≺+ ω
 
    ⊆to/refl : ∀{A w}(Δ : IList A) → Δ ⊆ Δ to w 
    ⊆to/refl Δ = st (⊆at/refl Δ) (λ ω → ⊆at/refl Δ)
@@ -126,6 +148,19 @@ module ILIST (UWF : UpwardsWellFounded) where
       → Δ ⊆ ((x at w) :: Γ) to w
    ⊆to/wken (st sub sub≺) = 
       st (⊆at/wken sub) (λ ω' → ⊆at/irrev (≺+⊀ ω') (sub≺ ω'))
+
+   ⊆to/stenirrev : ∀{A Γ Δ w w'}{x : A}
+      → w ⊀ w'
+      → Δ ⊆ ((x at w') :: Γ) to w
+      → Δ ⊆ Γ to w 
+   ⊆to/stenirrev {A}{Γ}{Δ}{w}{w'}{x} ω (st sub sub≺) = 
+      st fwd λ ω' x' → sub≺ ω' (S x')
+    where
+      fwd : ∀{A' w0} → A' at w0 ∈ Δ → (A' at w0 ∈ Γ) + (w ≺* w0 → Void)
+      fwd x with sub x 
+      ... | Inl Z = Inr ω
+      ... | Inl (S n) = Inl n
+      ... | Inr ω = Inr ω 
 
    ⊆to/irrev : ∀{A Γ Δ w w'}{x : A}
       → w ⊀ w'
@@ -138,6 +173,14 @@ module ILIST (UWF : UpwardsWellFounded) where
       → Δ ⊆ Γ to w 
       → ((x at w') :: Δ) ⊆ ((x at w') :: Γ) to w
    ⊆to/both (st sub sub≺) = st (⊆at/both sub) (λ ω → ⊆at/both (sub≺ ω))
+ 
+   ⊆to/trans : ∀{A w}{Γ Δ Ψ : IList A}
+      → Γ ⊆ Δ to w 
+      → Δ ⊆ Ψ to w 
+      → Γ ⊆ Ψ to w 
+   ⊆to/trans (st sub1 sub1≺) (st sub2 sub2≺) = st 
+      (λ x → case (sub1 x) sub2 Inr) 
+      (λ ω x → case (sub2≺ ω x) (sub1≺ ω) Inr)    
 
    -- Adding indices at a given world
    _atΓ_ : ∀{A} → List A → W → IList A
@@ -164,6 +207,13 @@ module ILIST (UWF : UpwardsWellFounded) where
    ... | Inl Refl = refl
    ... | Inr neq = abort (neq refl)
 
+   extend↓≺+ : ∀{A w w' Γ}{x : A} 
+      → w ≺+ w'
+      → (((x at w') :: Γ) ↓ w) ≡ (x at w' :: Γ ↓ w)
+   extend↓≺+ {_}{w}{w'} ω with w ≡? w'
+   extend↓≺+ {_}{w}{.w} ω | Inl Refl = abort (≺+⊀ ω ≺*≡)
+   extend↓≺+ {_}{w}{w'} ω | Inr neq = refl
+
    ⊆at/↓ : ∀{A} → (Γ : IList A) {w : W} → (Γ ↓ w) ⊆ Γ at w
    ⊆at/↓ [] = λ()
    ⊆at/↓ ((x at wx) :: Γ) {w} with w ≡? wx
@@ -175,6 +225,9 @@ module ILIST (UWF : UpwardsWellFounded) where
    ⊆at/↓≺ ((x at wx) :: Γ) {w} ω with w ≡? wx
    ⊆at/↓≺ ((x at .w) :: Γ) {w} ω | Inl Refl = ⊆at/irrev (≺+⊀ ω) (⊆at/↓≺ Γ ω)
    ⊆at/↓≺ ((x at wx) :: Γ) {w} ω | Inr neq = ⊆at/both (⊆at/↓≺ Γ ω)
+  
+   ⊆to/≡ : ∀{A w} {Γ Δ : IList A} → Γ ≡ Δ → Γ ⊆ Δ to w
+   ⊆to/≡ Refl = ⊆to/refl _
 
    ⊆to/↓ : ∀{A} → (Γ : IList A) {w : W} → (Γ ↓ w) ⊆ Γ to w
    ⊆to/↓ Γ = st (⊆at/↓ Γ) (λ ω → ⊆at/↓≺ Γ ω)
@@ -210,6 +263,13 @@ module ILIST (UWF : UpwardsWellFounded) where
       st (⊆at/wken (λ iN → sub iN)) 
        (λ ω' → ⊆at/irrev (≺+⊀trans ω' ω) (sub≺ ω'))
    
+   ⊆to/wken* : ∀{A Γ Δ w w'}{x : A}
+      → w' ≺* w
+      → Δ ⊆ Γ to w 
+      → Δ ⊆ ((x at w') :: Γ) to w
+   ⊆to/wken* ≺*≡ = ⊆to/wken
+   ⊆to/wken* (≺*+ ω) = ⊆to/wkenirrev (≺+⊀ ω) 
+
    wkto : ∀{A w w' Γ}{a : A} → w ≺ w' → (a at w :: Γ) ⊆ Γ to w'
    wkto ω = ⊆to/irrev (≺⊀ ω) (⊆to/refl _) 
 

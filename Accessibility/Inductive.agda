@@ -72,6 +72,29 @@ module TRANS-UWF (UWF : UpwardsWellFounded) where
       ≺*≡ : ∀{w} → w ≺* w
       ≺*+ : ∀{w₁ w₂} → w₁ ≺+ w₂ → w₁ ≺* w₂
 
+   ≺*S : ∀{w₁ w₂ w₃} → w₁ ≺ w₂ → w₂ ≺* w₃ → w₁ ≺+ w₃
+   ≺*S ω₁ ≺*≡ = ≺+0 ω₁
+   ≺*S ω₁ (≺*+ ω₂) = ≺+S ω₁ ω₂
+
+   ≺*S' : ∀{w₁ w₂ w₃} → w₁ ≺* w₂ → w₂ ≺ w₃ → w₁ ≺+ w₃
+   ≺*S' ≺*≡ ω₂ = ≺+0 ω₂
+   ≺*S' (≺*+ ω₁) ω₂ = ≺+S' ω₁ ω₂
+
+   ≺*+trans : ∀{w₁ w₂ w₃} → w₁ ≺* w₂ → w₂ ≺+ w₃ → w₁ ≺+ w₃
+   ≺*+trans ≺*≡ ω₂ = ω₂
+   ≺*+trans (≺*+ ω₁) ω₂ = ≺+trans ω₁ ω₂
+
+   ≺+*trans : ∀{w₁ w₂ w₃} → w₁ ≺+ w₂ → w₂ ≺* w₃ → w₁ ≺+ w₃
+   ≺+*trans ω₁ ≺*≡ = ω₁
+   ≺+*trans ω₁ (≺*+ ω₂) = ≺+trans ω₁ ω₂
+
+
+   ≺*trans : ∀{w₁ w₂ w₃} → w₁ ≺* w₂ → w₂ ≺* w₃ → w₁ ≺* w₃  
+   ≺*trans ≺*≡ ≺*≡ = ≺*≡
+   ≺*trans ≺*≡ (≺*+ ω₂) = ≺*+ ω₂
+   ≺*trans (≺*+ ω₁) ≺*≡ = ≺*+ ω₁
+   ≺*trans (≺*+ ω₁) (≺*+ ω₂) = ≺*+ (≺+trans ω₁ ω₂)
+
    -- Disconnectedness
    _⊀_ : W → W → Set
    w ⊀ w' = w ≺* w' → ⊥

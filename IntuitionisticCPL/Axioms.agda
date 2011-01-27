@@ -1,5 +1,5 @@
 -- Constructive Provability Logic 
--- The minimal, modal, propositional fragment
+-- The intuitionistic, modal, propositional fragment
 -- Robert J. Simmons, Bernardo Toninho
 
 -- Valid and invalid axioms
@@ -65,50 +65,174 @@ module SOUNDNESS (UWF : UpwardsWellFounded) where
    Dec : MCtx → Type → W → Set
    Dec Γ A w = ∀ {w' Γ} → w ≺ w' → Decidable (Γ ⊢ A [ w' ])
 
-   DProc : MCtx → Type → W → Set
-   DProc Γ A w = Sum 
+
+  
+   -- De Morgan's laws
+   DProc¬□ : MCtx → Type → W → Set
+   DProc¬□ Γ A w = Sum 
       (∀ {w'} → w ≺ w' → Γ ⇒ A [ w' ])
-      (∃ λ w' → (w ≺ w') × (Γ ⇒ A [ w' ] → Void))
+      (∃ λ w' → (w ≺ w') × (Γ ⇒ ¬ A [ w' ]))
 
-   -- FALSE: ¬ (□ A) → ◇ (¬ A) 
-   -- FALSE: ◇ (
-   a0 : ∀{Γ A w} 
-      → Con Γ w 
+   DProc□n : MCtx → Type → W → Set
+   DProc□n Γ A w = Sum 
+      (∀ {w'} → w ≺ w' → Γ ⇒ A [ w' ])
+      (∃ λ w' → (w ≺ w') × ((Γ ⇒ A [ w' ]) → Void) )
+
+   DProc¬◇ : MCtx → Type → W → Set
+   DProc¬◇ Γ A w = Sum 
+      (∀ {w'} → w ≺ w' → Γ ⇒ ¬ A [ w' ])
+      (∃ λ w' → (w ≺ w') × (Γ ⇒ A [ w' ]))
+
+   demorgan1 : ∀{Γ A w} 
       → Empty Γ w 
-      → ¬ (□ A) at w :: Γ ⇒ □ A [ w ]
-      → DProc Γ A w
-   a0 con emp (□R D) = Inl (λ ω → wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) (D ω))
-   a0 con emp (⊃L Z D _) = a0 con emp D
-   a0 con emp (⊃L (S n) _ _) = abort (emp n)
-   a0 con emp (⊥L (S n)) = abort (emp n)
-   a0 con emp (◇L (S n) _) = abort (emp n)
-   a0 con emp (□L (S n) _) = abort (emp n)
-   a0 con emp (¬◇L (S n) _) = abort (emp n)
-   a0 con emp (¬□L (S n) _) = abort (emp n)
+      → Equiv (DProc¬□ Γ A w) (Γ ⇒ ¬ (□ A) ⊃ ◇ (¬ A) [ w ])
+   demorgan1 {Γ} {A} {w} emp = forward , back2 
+    where 
+      forward : DProc¬□ Γ A w → Γ ⇒ ¬ (□ A) ⊃ ◇ (¬ A) [ w ]
+      forward (Inl D) = ⊃R (⊃L Z (□R 
+         λ ω → wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) (D ω)) (⊥L Z))
+      forward (Inr (w , ω , D⊥)) = 
+         ⊃R (◇R ω (wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) D⊥))
 
-   a1 : ∀{Γ A w}
-      → Con Γ w 
-      → Empty Γ w 
-      → ¬ (□ A) at w :: Γ ⇒ ◇ (¬ A) [ w ]
-      → DProc Γ A w
-   a1 con emp (⊃L Z D _) = a0 con emp D
-   a1 con emp (◇R ω D⊥) = Inr (_ , ω , 
-      λ D → con ω (nd→seq 
-       (⊃E (seq→nd (wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) D⊥)) (seq→nd D))))
-{-
-(seq→nd (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D⊥))
-(nd→seq 
-       (⊃E (seq→nd (wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) D⊥)) (seq→nd D))))
--}
+      back0 : ¬ (□ A) at w :: Γ ⇒ □ A [ w ] → DProc¬□ Γ A w
+      back0 (□R D) = Inl (λ ω → wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) (D ω))
+      back0 (⊃L Z D _) = back0 D
+      back0 (⊃L (S n) _ _) = abort (emp n)
+      back0 (⊥L (S n)) = abort (emp n)
+      back0 (◇L (S n) _) = abort (emp n)
+      back0 (□L (S n) _) = abort (emp n)
+      back0 (¬◇L (S n) _) = abort (emp n)
+      back0 (¬□L (S n) _) = abort (emp n)
 
-   a1 con emp (⊃L (S n) y' y0) = {!!}
-   a1 con emp (⊥L (S n)) = {!!}
-   a1 con emp (◇L (S n) y') = {!!}
-   a1 con emp (□L (S n) y') = {!!}
-   a1 con emp (¬◇L (S n) y') = {!!}
-   a1 con emp (¬□L (S n) y') = {!!}
+      back1 : ¬ (□ A) at w :: Γ ⇒ ◇ (¬ A) [ w ] → DProc¬□ Γ A w
+      back1 (⊃L Z D _) = back0 D
+      back1 (◇R ω D⊥) = Inr (_ , ω , wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) D⊥)
+      back1 (⊃L (S n) _ _) = abort (emp n)
+      back1 (⊥L (S n)) = abort (emp n)
+      back1 (◇L (S n) _) = abort (emp n)
+      back1 (□L (S n) _) = abort (emp n)
+      back1 (¬◇L (S n) _) = abort (emp n)
+      back1 (¬□L (S n) _) = abort (emp n)
+
+      back2 : Γ ⇒ ¬ (□ A) ⊃ ◇ (¬ A) [ w ] → DProc¬□ Γ A w
+      back2 (⊃R D) = back1 D
+      back2 (⊃L n _ _) = abort (emp n)
+      back2 (⊥L n) = abort (emp n)
+      back2 (◇L n _) = abort (emp n)
+      back2 (□L n _) = abort (emp n)
+      back2 (¬◇L n _) = abort (emp n)
+      back2 (¬□L n _) = abort (emp n)
+
+   demorgan2 : ∀{Γ A w} → Con Γ w → Γ ⇒ ◇ (¬ A) ⊃ ¬ (□ A) [ w ]
+   demorgan2 con = ⊃R (◇L Z 
+      λ ω D⊥ → ⊃R (□L Z 
+      λ D → abort (con ω (wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) (nd→seq 
+       (⊃E (seq→nd D⊥) 
+        (seq→nd (wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) (D ω)))))))))
+
+  
+
+   demorgan3 : ∀{Γ A w}
+            → Empty Γ w
+            → Equiv (DProc¬◇ Γ A w) (Γ ⇒ ¬ (◇ A) ⊃ □ (¬ A) [ w ])
+   demorgan3 {Γ} {A} {w} emp = forward , back2
+    where
+      forward : (DProc¬◇ Γ A w) → (Γ ⇒ ¬ (◇ A) ⊃ □ (¬ A) [ w ])
+      forward (Inl D⊥) = 
+         ⊃R (□R (λ ω → wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) (D⊥ ω)))
+      forward (Inr (w₀ , ω , D)) = 
+         ⊃R (⊃L Z (◇R ω (wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) D)) (⊥L Z))
+
+      back : (◇ A ⊃ ⊥) at w :: Γ ⇒ ◇ A [ w ] → DProc¬◇ Γ A w
+      back (⊃L Z D _) = back D
+      back (⊃L (S n) _ _) = abort (emp n)
+      back (⊥L (S n)) = abort (emp n)
+      back (◇R ω D) = Inr (_ , ω , wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) D)
+      back (◇L (S n) _) = abort (emp n)
+      back (□L (S n) _) = abort (emp n)
+      back (¬◇L (S n) _) = abort (emp n)
+      back (¬□L (S n) _) = abort (emp n)
+
+      back1 : (◇ A ⊃ ⊥) at w :: Γ ⇒ □ (A ⊃ ⊥) [ w ] → DProc¬◇ Γ A w
+      back1 (⊃L Z D _) = back D
+      back1 (⊃L (S n) _ _) = abort (emp n)
+      back1 (⊥L (S n)) = abort (emp n)
+      back1 (◇L (S n) _) = abort (emp n)
+      back1 (□R D) = Inl (λ ω → wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) (D ω))
+      back1 (□L (S n) _) = abort (emp n)
+      back1 (¬◇L (S n) _) = abort (emp n)
+      back1 (¬□L (S n) _) = abort (emp n)
+       
+      back2 : Γ ⇒ ¬ (◇ A) ⊃ □ (¬ A) [ w ] → DProc¬◇ Γ A w
+      back2 (⊃R D) = back1 D
+      back2 (⊃L n _ _) = abort (emp n)
+      back2 (⊥L n) = abort (emp n)
+      back2 (◇L n _) = abort (emp n)
+      back2 (□L n _) = abort (emp n)
+      back2 (¬◇L n _) = abort (emp n)
+      back2 (¬□L n _) = abort (emp n)
+
+   demorgan4 : ∀{Γ A w} → Con Γ w → Γ ⇒ □ (¬ A) ⊃ ¬ (◇ A) [ w ]
+   demorgan4 con = ⊃R (⊃R (◇L Z (λ ω D → □L (S Z) 
+      λ D₀ → abort (con ω (nd→seq (⊃E 
+       (seq→nd (wk (⊆to/irrev (≺⊀ ω) (⊆to/irrev (≺⊀ ω) (⊆to/refl _))) 
+        (D₀ ω))) 
+       (seq→nd (wk (⊆to/irrev (≺⊀ ω) (⊆to/irrev (≺⊀ ω) (⊆to/refl _))) 
+        D))))))))
 
 
+   □n : ∀{Γ A w} 
+            → Empty Γ w
+            → Equiv (DProc□n Γ A w) (Γ ⇒ ¬ (□ A) ⊃ ¬□ A [ w ])
+   □n {Γ} {A} {w} emp = forward , back2
+    where
+      forward : (DProc□n Γ A w) → (Γ ⇒ ¬ (□ A) ⊃ ¬□ A [ w ])
+      forward (Inl D) = ⊃R (⊃L Z (□R (λ ω → wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) (D ω))) (⊥L Z))
+      forward (Inr (w₀ , ω , DV)) = ⊃R (¬□R ω (λ D → DV (wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) D)))
+
+      back : (□ A ⊃ ⊥) at w :: Γ ⇒ □ A [ w ] → (DProc□n Γ A w)
+      back (⊃L Z y' y0) = back y'
+      back (⊃L (S n) y' y0) = abort (emp n)
+      back (⊥L (S n)) = abort (emp n)
+      back (◇L (S n) y') = abort (emp n)
+      back (□R D) = Inl (λ ω → wk (⊆to/irrev (≺⊀ ω) (⊆to/refl _)) (D ω))
+      back (□L (S n) y') = abort (emp n)
+      back (¬◇L (S n) y') = abort (emp n)
+      back (¬□L (S n) y') = abort (emp n) 
+
+      back1 : (□ A ⊃ ⊥) at w :: Γ ⇒ ¬□ A [ w ] → (DProc□n Γ A w)
+      back1 (⊃L Z y' y0) = back y'
+      back1 (⊃L (S n) y' y0) = abort (emp n)
+      back1 (⊥L (S n)) = abort (emp n)
+      back1 (◇L (S n) y') = abort (emp n)
+      back1 (□L (S n) y') = abort (emp n)
+      back1 (¬◇L (S n) y') = abort (emp n)
+      back1 (¬□R ω D) = Inr (_ , (ω , (λ D₀ → D (wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) D₀))))
+      back1 (¬□L (S n) y') = abort (emp n) 
+
+      back2 : (Γ ⇒ ¬ (□ A) ⊃ ¬□ A [ w ]) → (DProc□n Γ A w)
+      back2 (⊃R D) = back1 D
+      back2 (⊃L n _ _) = abort (emp n)
+      back2 (⊥L n) = abort (emp n)
+      back2 (◇L n _) = abort (emp n)
+      back2 (□L n _) = abort (emp n)
+      back2 (¬◇L n _) = abort (emp n)
+      back2 (¬□L n _) = abort (emp n) 
+
+
+   ◇c : ∀{Γ A w} 
+            → Empty Γ w
+            → Equiv (DProc□n Γ A w) (Γ ⇒ ¬□ (¬ A) ⊃ ◇ A [ w ])
+
+   ◇c {Γ} {A} {w} emp = {!!} , {!!} 
+    where
+      forward : (DProc¬□ Γ A w) → (Γ ⇒ ¬□ (¬ A) ⊃ ◇ A [ w ])
+      forward (Inl inl) = ⊃R (¬□L Z (λ ω D₀ → ◇R ω (wk (⊆to/wkenirrev (≺⊀ ω) (⊆to/refl _)) (inl ω))))
+      forward (Inr (w₀ , ω , DV)) = ⊃R (¬□L Z (λ ω' D₀ → {!!})) 
+
+
+
+   -- Valid Axioms
    validaxioms : ∀{Γ A w} 
       → Axiom A 
       → (∀ {w' Γ} → w ≺ w' → Γ ⊢ ⊥ [ w' ] → Void) 

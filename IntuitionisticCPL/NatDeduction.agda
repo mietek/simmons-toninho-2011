@@ -24,25 +24,25 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    wk₁ w ih sub (⊃I D) = ⊃I (wk₁ w ih (⊆to/both sub) D)
    wk₁ w ih sub (⊃E D₁ D₂) = ⊃E (wk₁ w ih sub D₁) (wk₁ w ih sub D₂)
    wk₁ w ih sub (⊥E D) = ⊥E (wk₁ w ih sub D)
-   wk₁ w ih sub (◇I ω D) = ◇I ω (ih _ ω (⊆to/≺ (≺+0 ω) sub) D)
+   wk₁ w ih sub (◇I ω D) = ◇I ω (ih _ ω (⊆to/≺ ω sub) D)
    wk₁ w ih sub (◇E D D') = 
       ◇E (wk₁ w ih sub D) 
-       (λ ω D₀ → wk₁ w ih sub (D' ω (ih _ ω (⊆to/≺' (≺+0 ω) sub) D₀)))
-   wk₁ w ih sub (□I D) = □I (λ ω → ih _ ω (⊆to/≺ (≺+0 ω) sub) (D ω))
+       (λ ω D₀ → wk₁ w ih sub (D' ω (ih _ ω (⊆to/≺' ω sub) D₀)))
+   wk₁ w ih sub (□I D) = □I (λ ω → ih _ ω (⊆to/≺ ω sub) (D ω))
    wk₁ w ih sub (□E D₁ D₂) = 
       □E (wk₁ w ih sub D₁) 
-       (λ D₀ → wk₁ w ih sub (D₂ (λ ω → ih _ ω (⊆to/≺' (≺+0 ω) sub) (D₀ ω))))
+       (λ D₀ → wk₁ w ih sub (D₂ (λ ω → ih _ ω (⊆to/≺' ω sub) (D₀ ω))))
    wk₁ w ih sub (¬◇I D) = 
-      ¬◇I (λ ω D₀ → D ω (ih _ ω (⊆to/≺' (≺+0 ω) sub) D₀))
+      ¬◇I (λ ω D₀ → D ω (ih _ ω (⊆to/≺' ω sub) D₀))
    wk₁ w ih sub (¬◇E D₁ D₂) =
       ¬◇E (wk₁ w ih sub D₁) 
        (λ D₀ → 
-        wk₁ w ih sub (D₂ (λ ω D → D₀ ω (ih _ ω (⊆to/≺ (≺+0 ω) sub) D))))
-   wk₁ w ih sub (¬□I ω D) = ¬□I ω (λ D₀ → D (ih _ ω (⊆to/≺' (≺+0 ω) sub) D₀))
+        wk₁ w ih sub (D₂ (λ ω D → D₀ ω (ih _ ω (⊆to/≺ ω sub) D))))
+   wk₁ w ih sub (¬□I ω D) = ¬□I ω (λ D₀ → D (ih _ ω (⊆to/≺' ω sub) D₀))
    wk₁ w ih sub (¬□E D₁ D₂) =
       ¬□E (wk₁ w ih sub D₁) 
        (λ ω D₀ → 
-        wk₁ w ih sub (D₂ ω (λ D → D₀ (ih _ ω (⊆to/≺ (≺+0 ω) sub) D))))
+        wk₁ w ih sub (D₂ ω (λ D → D₀ (ih _ ω (⊆to/≺ ω sub) D))))
 
    wk : ∀{Γ Γ' w A}
       → Γ ⊆ Γ' to w
@@ -107,21 +107,21 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    m→ sub (⊃I' D) = ⊃I (m→ (⊆to/wken sub) D)
    m→ sub (⊃E' DA D) = ⊃E (m→ sub DA) (m→ sub D)
    m→ sub (⊥E' D) = ⊥E (m→ sub D)
-   m→ sub (◇I' ω D) = ◇I ω (wk (⊆to/≺ (≺+0 ω) sub) D)
+   m→ sub (◇I' ω D) = ◇I ω (wk (⊆to/≺ ω sub) D)
    m→ sub (◇E' DA s D) = 
-      ◇E (m→ sub DA) (λ ω D₀ → m→ sub (D ω (wk (⊆to/≺' (≺+0 ω) sub) D₀)))
-   m→ sub (□I' D) = □I (λ ω → wk (⊆to/≺ (≺+0 ω) sub) (D ω) )
+      ◇E (m→ sub DA) (λ ω D₀ → m→ sub (D ω (wk (⊆to/≺' ω sub) D₀)))
+   m→ sub (□I' D) = □I (λ ω → wk (⊆to/≺ ω sub) (D ω) )
    m→ sub (□E' DA s D) = 
       □E (m→ sub DA) 
-       (λ D₀ → m→ sub (D (λ ω → wk (⊆to/≺' (≺+0 ω) sub) (D₀ ω))))
-   m→ sub (¬◇I' D) = ¬◇I (λ ω D₀ → D ω (wk (⊆to/≺' (≺+0 ω) sub) D₀))
+       (λ D₀ → m→ sub (D (λ ω → wk (⊆to/≺' ω sub) (D₀ ω))))
+   m→ sub (¬◇I' D) = ¬◇I (λ ω D₀ → D ω (wk (⊆to/≺' ω sub) D₀))
    m→ sub (¬◇E' DA s D) = 
       ¬◇E (m→ sub DA) 
-       (λ D₀ → m→ sub (D (λ ω D' → D₀ ω (wk (⊆to/≺ (≺+0 ω) sub) D'))))
-   m→ sub (¬□I' ω D) = ¬□I ω (λ D₀ → D (wk (⊆to/≺' (≺+0 ω) sub) D₀))
+       (λ D₀ → m→ sub (D (λ ω D' → D₀ ω (wk (⊆to/≺ ω sub) D'))))
+   m→ sub (¬□I' ω D) = ¬□I ω (λ D₀ → D (wk (⊆to/≺' ω sub) D₀))
    m→ sub (¬□E' DA s D) = 
       ¬□E (m→ sub DA) 
-       (λ ω D₀ → m→ sub (D ω (λ D' → D₀ (wk (⊆to/≺ (≺+0 ω) sub) D'))))
+       (λ ω D₀ → m→ sub (D ω (λ D' → D₀ (wk (⊆to/≺ ω sub) D'))))
 
    →m : ∀{Γ w Δ A} → (Γ ↓ w) ≡ Δ → Γ ⊢ A [ w ] → ∃ λ s → ND w Γ Δ s A
    →m Refl (hyp iN) = , hyp' iN
@@ -132,16 +132,16 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    →m Refl (◇I ω D) = , ◇I' ω (wk (⊆to/↓≺ _ (≺+0 ω)) D)
    →m Refl (◇E D₁ D₂) = ,
       ◇E' (snd (→m refl D₁)) _ 
-       (λ ω D₀ → snd (→m refl (D₂ ω (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D₀))))
+       (λ ω D₀ → snd (→m refl (D₂ ω (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))))
    →m {Γ} Refl (□I D) = , □I' (λ ω → wk (⊆to/↓≺ Γ (≺+0 ω)) (D ω))
    →m {Γ} Refl (□E D₁ D₂) = , 
       □E' (snd (→m refl D₁)) _
-       (λ D₀ → snd (→m refl (D₂ (λ ω → wk (⊆to/≺ (≺+0 ω) (⊆to/↓ Γ)) (D₀ ω)))))
-   →m Refl (¬◇I D) = , ¬◇I' (λ ω D₀ → D ω (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D₀))
+       (λ D₀ → snd (→m refl (D₂ (λ ω → wk (⊆to/≺ ω (⊆to/↓ Γ)) (D₀ ω)))))
+   →m Refl (¬◇I D) = , ¬◇I' (λ ω D₀ → D ω (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))
    →m Refl (¬◇E D₁ D₂) = , 
       ¬◇E' (snd (→m refl D₁)) _ 
        (λ D₀ → snd (→m refl (D₂ (λ ω D' → D₀ ω (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
-   →m Refl (¬□I ω D) = , ¬□I' ω (λ D₀ → D (wk (⊆to/≺ (≺+0 ω) (⊆to/↓ _)) D₀))
+   →m Refl (¬□I ω D) = , ¬□I' ω (λ D₀ → D (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))
    →m Refl (¬□E D₁ D₂) = , 
       ¬□E' (snd (→m refl D₁)) _ 
        (λ ω D₀ → snd (→m refl (D₂ ω (λ D' → D₀ (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
