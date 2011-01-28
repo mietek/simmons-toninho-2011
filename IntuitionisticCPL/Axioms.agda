@@ -1,8 +1,8 @@
 -- Constructive Provability Logic 
--- The intuitionistic, modal, propositional fragment
+-- Tethered intuitionstic variant
 -- Robert J. Simmons, Bernardo Toninho
 
--- Valid axioms
+-- Valid and invalid axioms
 
 module IntuitionisticCPL.Axioms where
 open import Prelude hiding (⊥ ; ¬)
