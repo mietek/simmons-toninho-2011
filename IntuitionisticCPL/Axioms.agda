@@ -95,7 +95,13 @@ module AXIOMS (UWF : UpwardsWellFounded) where
    Löb : ∀{Γ A}
       → (∀{w} → Γ ⊢ □ A ⊃ A [ w ])
       → (∀{w} → Γ ⊢ A [ w ])
-   Löb {A = A} D = {!!}
+   Löb {Γ = Γ} {A = A} = λ D {w} → ind P lemma _ D
+    where
+      P : W → Set
+      P = λ w → (∀{w} → Γ ⊢ □ A ⊃ A [ w ]) → Γ ⊢ A [ w ]
+ 
+      lemma : (w : W) → ((w' : W) → w ≺ w' → P w') → P w
+      lemma w ih D = ⊃E D (□I (λ ω → ih _ ω D)) 
 
    -- De Morgan dualities (Theorem 3.6)
    ax◇¬ : ∀{Γ A w} 
