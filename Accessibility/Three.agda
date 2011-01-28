@@ -54,4 +54,4 @@ module SMALL-EXAMPLE where
    SmallExample : UpwardsWellFounded
    SmallExample = record {W = Three; _≺_ = _≺_ ; _≡?_ = _≡?_ ; ind = ind}
 
-open SMALL-EXAMPLE public using (SmallExample)
+open SMALL-EXAMPLE public using (αβ ; αγ ; βγ ; SmallExample)

@@ -85,14 +85,15 @@ module AXIOMS (UWF : UpwardsWellFounded
       → Γ ⊢ ¬ (◇ ⊥) [ w ]
    ax◇⊥ = ⊃I (◇E ≺*≡ (hyp Z) 
       (λ ω D₀ → ⊥E (≺*+ (≺+0 ω)) D₀))
- 
-   aux : ∀{Γ w w'}
-      →  w ≺ w' → Γ ⊢ ⊥ [ w' ] → Γ ⊢ ⊥ [ w ]
-   aux ω (CORE.hyp x) = ⊥E (≺*+ (≺+0 ω)) (hyp x)
-   aux ω (CORE.⊃E D₁ D₂) = {!!}
-   aux ω (CORE.⊥E ωh D₁) = {!!}
-   aux ω (CORE.◇E ωh D₁ D₂) = {!!}
-   aux ω (CORE.□E ωh D₁ D₂) = {!!} 
+
+
+   ax4◇ : ∀{Γ A w}
+      → Trans
+      → Γ ⊢ ◇ (◇ A) ⊃ ◇ A [ w ]
+   ax4◇  _≺≺_ = ⊃I (◇E ≺*≡ (hyp Z) 
+      (λ ω D₀ → ◇E (≺*+ (≺+0 ω)) D₀ 
+      (λ ω' D₀' → ◇I (ω ≺≺ ω') D₀')))
+
    
    
  -- Provability logic (Theorem 3.4)
@@ -110,29 +111,28 @@ module AXIOMS (UWF : UpwardsWellFounded
          λ ω → ⊃E (DInd ω) (⊃E (ih _ ω) (□I (λ ω' → DInd (ω ≺≺ ω')))))
 
    -- Löb rule (Theorem 3.5)
+  
+
    Löb : ∀{Γ A}
       → (∀{w} → Γ ⊢ □ A ⊃ A [ w ])
       → (∀{w} → Γ ⊢ A [ w ])
-   Löb {A = A} D = {!!}
+   Löb {Γ} {A} D = {!!}
+
+
 
    -- De Morgan dualities (Theorem 3.6)
-   ax◇¬ : ∀{Γ A w} 
-      → Con Γ w 
+   ax◇¬ : ∀{Γ A w}  
       → Γ ⊢ ◇ (¬ A) ⊃ ¬ (□ A) [ w ]
-   ax◇¬ con = ⊃I (⊃I (□E ≺*≡ (hyp Z) 
+   ax◇¬  = ⊃I (⊃I (□E ≺*≡ (hyp Z) 
       (λ D₀ → ◇E ≺*≡ (hyp (S Z)) 
-      (λ ω D₀' → abort (con ω (seq→nd dec≺ 
-        (wk dec≺ (⊆to/irrev (≺⊀ ω) (⊆to/irrev (≺⊀ ω) (⊆to/refl _))) 
-        (nd→seq dec≺ (⊃E D₀' (D₀ ω))))))))))
+      (λ ω D₀' → ⊥E (≺*+ (≺+0 ω)) (⊃E D₀' (D₀ ω))))))
+
 
    ax□¬ : ∀{Γ A w} 
-      → Con Γ w 
       → Γ ⊢ □ (¬ A) ⊃ ¬ (◇ A) [ w ]
-   ax□¬ con = ⊃I (⊃I (◇E ≺*≡ (hyp Z) 
+   ax□¬ = ⊃I (⊃I (◇E ≺*≡ (hyp Z) 
       (λ ω D₀ → □E ≺*≡ (hyp (S Z)) 
-      (λ D₀' → abort (con ω (seq→nd dec≺ 
-       (wk dec≺ (⊆to/irrev (≺⊀ ω) (⊆to/irrev (≺⊀ ω) (⊆to/refl _))) 
-       (nd→seq dec≺ (⊃E (D₀' ω) D₀)))))))))
+      (λ D₀' → ⊥E (≺*+ (≺+0 ω)) (⊃E (D₀' ω) D₀)))))
 
 module NON-AXIOMS where
    open TRANS-UWF Example
@@ -141,3 +141,145 @@ module NON-AXIOMS where
    open CORE Example
    open SEQUENT Example
    open EQUIV Example
+
+   Q : Type
+   Q = a "Q"   
+
+
+   deMorgan2 : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ β ] → Void
+   deMorgan2 = lem0
+    where
+
+      lem2 : ((□ Q ⊃ ⊥) at β :: []) ⇒ Q [ δ ] → Void
+      lem2 (hyp (S ())) 
+      lem2 (⊃L (≺*+ (≺+0 ())) Z D₁ D₂)
+      lem2 (⊃L (≺*+ (≺+S () y')) Z D₁ D₂)
+      lem2 (⊃L ωh (S ()) D₁ D₂)
+      lem2 (⊥L ωh (S ()))
+      lem2 (◇L ωh (S ()) D₁)
+      lem2 (□L ωh (S ()) D₁) 
+
+      lem1 : (□ Q ⊃ ⊥) at β :: [] ⇒ (□ Q) [ β ] → Void
+      lem1 (⊃L ωh Z D₁ D₂) = lem1 D₁
+      lem1 (⊃L ωh (S ()) D₁ D₂)
+      lem1 (⊥L ωh (S ()))
+      lem1 (◇L ωh (S ()) D₁)
+      lem1 (□R D₁) = lem2 (D₁ Z)
+      lem1 (□L ωh (S ()) D₁)
+      
+      lem0 : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ β ] → Void
+      lem0 (⊃R (⊃L ωh Z D₁ D₂)) = lem1 D₁
+      lem0 (⊃R (⊃L ωh (S ()) D₁ D₂))
+      lem0 (⊃R (⊥L ωh (S ())))
+      lem0 (⊃R (◇R Z (⊃R (⊃L (≺*+ (≺+0 ())) (S Z) D₁ D₂))))
+      lem0 (⊃R (◇R Z (⊃R (⊃L (≺*+ (≺+S () y')) (S Z) D₁ D₂))))
+      lem0 (⊃R (◇R Z (⊃R (⊃L ωh (S (S ())) D₁ D₂))))
+      lem0 (⊃R (◇R Z (⊃R (⊥L ωh (S (S ()))))))
+      lem0 (⊃R (◇R Z (⊃R (◇L ωh (S (S ())) D₁))))
+      lem0 (⊃R (◇R Z (⊃R (□L ωh (S (S ())) D₁))))
+      lem0 (⊃R (◇R Z (⊃L (≺*+ (≺+0 ())) Z D₁ D₂)))
+      lem0 (⊃R (◇R Z (⊃L (≺*+ (≺+S () y')) Z D₁ D₂)))
+      lem0 (⊃R (◇R Z (⊃L ωh (S ()) D₁ D₂)))
+      lem0 (⊃R (◇R Z (⊥L ωh (S ()))))
+      lem0 (⊃R (◇R Z (◇L ωh (S ()) D₁)))
+      lem0 (⊃R (◇R Z (□L ωh (S ()) D₁)))
+      lem0 (⊃R (◇R (S ()) D₁))
+      lem0 (⊃R (◇L ωh (S ()) D₁))
+      lem0 (⊃R (□L ωh (S ()) D₁))
+      lem0 (⊃L ωh () D₁ D₂)
+      lem0 (⊥L ωh ())
+      lem0 (◇L ωh () D₁)
+      lem0 (□L ωh () D₁)
+
+
+   deMorgan1 : [] ⇒ ¬ (◇ Q) ⊃ □(¬ Q) [ β ] → Void
+   deMorgan1 = lem0
+    where
+      lem2 : ( (◇ Q ⊃ ⊥) at β :: []) ⇒ (◇ Q) [ β ] → Void
+      lem2 (⊃L ωh Z D₁ D₂) = lem2 D₁
+      lem2 (⊃L ωh (S ()) D₁ D₂)
+      lem2 (⊥L ωh (S ()))
+      lem2 (CORE.◇R Z (hyp (S ()))) 
+      lem2 (CORE.◇R Z (⊃L (≺*+ (≺+0 ())) Z D₁ D₂)) 
+      lem2 (CORE.◇R Z (⊃L (≺*+ (≺+S () y')) Z D₁ D₂))
+      lem2 (CORE.◇R Z (⊃L ωh (S ()) D₁ D₂))
+      lem2 (CORE.◇R Z (⊥L ωh (S ()))) 
+      lem2 (CORE.◇R Z (◇L ωh (S ()) D₁)) 
+      lem2 (CORE.◇R Z (□L ωh (S ()) D₁)) 
+      lem2 (◇R (S ()) D₁)
+      lem2 (◇L ωh (S ()) D₁)
+      lem2 (□L ωh (S ()) D₁) 
+
+      lem1 : ((◇ Q ⊃ ⊥) at β :: []) ⇒ (a "Q" ⊃ ⊥) [ δ ] → Void
+      lem1 (⊃R (⊃L (≺*+ (≺+0 ())) (S Z) D₁ D₂))
+      lem1 (⊃R (⊃L (≺*+ (≺+S () y')) (S Z) D₁ D₂))
+      lem1 (⊃R (⊃L ωh (S (S ())) D₁ D₂))
+      lem1 (⊃R (⊥L ωh (S (S ()))))
+      lem1 (⊃R (◇L ωh (S (S ())) D₁))
+      lem1 (⊃R (□L ωh (S (S ())) D₁))
+      lem1 (⊃L (≺*+ (≺+0 ())) Z D₁ D₂)
+      lem1 (⊃L (≺*+ (≺+S () y')) Z D₁ D₂)
+      lem1 (⊃L ωh (S ()) D₁ D₂)
+      lem1 (⊥L ωh (S ()))
+      lem1 (◇L ωh (S ()) D₁)
+      lem1 (□L ωh (S ()) D₁)
+          
+      lem0 : [] ⇒ ¬ (◇ Q) ⊃ □(¬ Q) [ β ] → Void
+      lem0 (⊃R (⊃L ωh Z D₁ D₂)) = lem2 D₁
+      lem0 (⊃R (⊃L ωh (S ()) D₁ D₂))
+      lem0 (⊃R (⊥L ωh (S ())))
+      lem0 (⊃R (◇L ωh (S ()) D₁))
+      lem0 (⊃R (□R D₁)) = lem1 (D₁ Z)
+      lem0 (⊃R (□L ωh (S ()) D₁))
+      lem0 (⊃L ωh () D₁ D₂) 
+      lem0 (⊥L ωh ())
+      lem0 (◇L ωh () D₁) 
+      lem0 (□L ωh () D₁) 
+
+
+   
+   axIK : [] ⇒ (◇ Q ⊃ □ ⊥) ⊃ □ (Q ⊃ ⊥) [ β ] → Void
+   axIK = lem0
+    where
+       lem2 : ((◇ Q ⊃ □ ⊥) at β :: []) ⇒ (Q ⊃ ⊥) [ δ ] → Void
+       lem2 (⊃R (⊃L (≺*+ (≺+0 ())) (S Z) D₁ D₂))
+       lem2 (⊃R (⊃L (≺*+ (≺+S () y')) (S Z) D₁ D₂))
+       lem2 (⊃R (⊃L ωh (S (S ())) D₁ D₂))
+       lem2 (⊃R (⊥L ωh (S (S ()))))
+       lem2 (⊃R (◇L ωh (S (S ())) D₁)) 
+       lem2 (⊃R (□L ωh (S (S ())) D₁)) 
+       lem2 (⊃L (≺*+ (≺+0 ())) Z D₁ D₂)
+       lem2 (⊃L (≺*+ (≺+S () y')) Z D₁ D₂)
+       lem2 (⊃L ωh (S ()) D₁ D₂)
+       lem2 (⊥L ωh (S ()))
+       lem2 (◇L ωh (S ()) D₁)
+       lem2 (□L ωh (S ()) D₁)
+     
+       lem1 : ((◇ Q) ⊃ □ ⊥) at β :: [] ⇒ (◇ Q) [ β ] → Void
+       lem1 (⊃L ωh' Z D₁' D₂) = lem1 D₁'
+       lem1 (⊃L ωh' (S ()) D₁' D₂)
+       lem1 (⊥L ωh' (S ())) 
+       lem1 (◇R Z (hyp (S ())))
+       lem1 (◇R Z (⊃L (≺*+ (≺+0 ())) Z D₁ D₂))
+       lem1 (◇R Z (⊃L (≺*+ (≺+S () y')) Z D₁ D₂))
+       lem1 (◇R Z (⊃L ωh (S ()) D₁ D₂))
+       lem1 (◇R Z (⊥L ωh (S ()))) 
+       lem1 (◇R Z (◇L ωh (S ()) D₁)) 
+       lem1 (◇R Z (□L ωh (S ()) D₁)) 
+       lem1 (◇R (S ()) D₁')
+       lem1 (◇L ωh' (S ()) D₁')
+       lem1 (□L ωh' (S ()) D₁') 
+
+       lem0 : [] ⇒ (◇ Q ⊃ □ ⊥) ⊃ □ (Q ⊃ ⊥) [ β ] → Void
+       lem0 (⊃R (⊃L ωh Z D₁ D₂)) = lem1 D₁
+       lem0 (⊃R (⊃L ωh (S ()) D₁ D₂))
+       lem0 (⊃R (⊥L ωh (S ())))
+       lem0 (⊃R (◇L ωh (S ()) D₁))
+       lem0 (⊃R (□R D₁)) = lem2 (D₁ Z)
+       lem0 (⊃R (□L ωh (S ()) D₁))
+       lem0 (⊃L ωh () D₁ D₂)
+       lem0 (⊥L ωh ())
+       lem0 (◇L ωh () D₁) 
+       lem0 (□L ωh () D₁)
+
+

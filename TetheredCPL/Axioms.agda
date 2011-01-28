@@ -10,6 +10,7 @@ open import Accessibility.Inductive
 open import Accessibility.Three
 open import Accessibility.IndexedList
 open import TetheredCPL.Core
+open import TetheredCPL.NatDeduction
 open import TetheredCPL.Sequent
 open import TetheredCPL.Equiv
 
@@ -32,10 +33,11 @@ module AXIOMS (UWF : UpwardsWellFounded) where
    open PROPERTIES UWF
    open ILIST UWF
    open CORE UWF 
+   open NAT-DEDUCTION UWF
    open SEQUENT UWF
    open EQUIV UWF
 
-   -- Axioms of intuitionstic propositional logic (Theorem 3.1)
+ -- Axioms of intuitionstic propositional logic (Theorem 3.1)
    axI : ∀{Γ A w} 
       → Γ ⊢ A ⊃ A [ w ]
    axI = ⊃I (hyp Z)
@@ -52,13 +54,13 @@ module AXIOMS (UWF : UpwardsWellFounded) where
       → Γ ⊢ ⊥ ⊃ A [ w ]
    ax⊥E = ⊃I (⊥E (hyp Z))
 
-   -- Necessitation rule (Theorem 3.2)
+ -- Necessitation rule (Theorem 3.2)
    Nec : ∀{Γ A} 
       → (∀{w} → Γ ⊢ A [ w ])
       → (∀{w} → Γ ⊢ □ A [ w ])
    Nec D = □I (λ ω → D) 
 
-   -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
+ -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
    axK□ : ∀{Γ A B w}
       → Γ ⊢ □ (A ⊃ B) ⊃ □ A ⊃ □ B [ w ]
    axK□ = ⊃I (⊃I (□E (hyp (S Z))
@@ -77,7 +79,22 @@ module AXIOMS (UWF : UpwardsWellFounded) where
    ax4□ _≺≺_ = ⊃I (□E (hyp Z) 
       λ D → □I λ ω → □I λ ω' → D (ω ≺≺ ω'))
 
-   -- Provability logic (Theorem 3.4)
+ -- Attempting to prove ax4◇
+{-
+   trans◇ : ∀{Γ A w'} 
+      → Γ ⇒ ◇ A [ w' ] 
+      → ((A : Type) → Γ ⊢ A [ w' ]) + (∃ λ w'' → w' ≺ w'' × (Γ ⊢ A [ w'' ]))
+   trans◇ (⊃L x D E) with trans◇ E
+   ... | Inl D' = Inl (λ A → subst (⊃E (hyp x) (seq→nd D)) (D' A))
+   ... | Inr (w' , ω , D') = Inr (w' , ω , wk-nd (wkto ω) D')
+   trans◇ (⊥L x) = Inl (λ A → ⊥E (hyp x)) -- ◇R ω (⊥L x)
+   trans◇ (◇R ω' D) = Inr (_ , ω' , seq→nd D) -- ◇R (ω ≺≺ ω') D
+   trans◇ (◇L x D) with trans◇ (D {!!} {!!})
+   ... | z = {!!}
+   trans◇ (□L x D) = {!!}
+-}
+
+ -- Axiom GL (Theorem 3.4)
    axGL : ∀{Γ A w}
       → Trans
       → Γ ⊢ □ (□ A ⊃ A) ⊃ □ A [ w ]
@@ -91,7 +108,7 @@ module AXIOMS (UWF : UpwardsWellFounded) where
          λ DInd → □I 
          λ ω → ⊃E (DInd ω) (⊃E (ih _ ω) (□I (λ ω' → DInd (ω ≺≺ ω')))))
 
-   -- Löb rule (Theorem 3.5)
+ -- Löb rule (Theorem 3.5)
    Löb : ∀{Γ A}
       → (∀{w} → Γ ⊢ □ A ⊃ A [ w ])
       → (∀{w} → Γ ⊢ A [ w ])
@@ -103,7 +120,7 @@ module AXIOMS (UWF : UpwardsWellFounded) where
       lemma : (w : W) → ((w' : W) → w ≺ w' → P w') → P w
       lemma w ih D = ⊃E D (□I (λ ω → ih _ ω D)) 
 
-   -- De Morgan dualities (Theorem 3.6)
+ -- De Morgan laws (Theorem 3.6)
    ax◇¬ : ∀{Γ A w} 
       → Con Γ w 
       → Γ ⊢ ◇ (¬ A) ⊃ ¬ (□ A) [ w ]
@@ -130,43 +147,213 @@ module NON-AXIOMS where
    Q : Type
    Q = a "Q"   
 
-   -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
-   ax◇⊥ : [ ⊥ at γ ] ⇒ ¬ (◇ ⊥) [ β ] → Void
-   ax◇⊥ D = {!!}
+   P : Type
+   P = a "P"   
 
-   ax4□ : [] ⇒ ◇ (◇ Q) ⊃ ◇ Q [ α ] → Void
-   ax4□ (⊃L () _ _)
-   ax4□ (⊥L ()) 
-   ax4□ (◇L () _)
-   ax4□ (□L () _)
-   ax4□ (⊃R D) = {!!}
+ -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
+   ax◇⊥ : [ ⊥ at γ ] ⇒ ¬ (◇ ⊥) [ β ] → Void
+   ax◇⊥ (⊃L (S ()) _ _) 
+   ax◇⊥ (⊥L (S ())) 
+   ax◇⊥ (◇L (S ()) _)
+   ax◇⊥ (□L (S ()) _) 
+   ax◇⊥ (⊃R D) = lem1 D
     where
-      lem3 : ∀{w} → [] ⇒ Q [ w ] → Void
-      lem3 (hyp ())
-      lem3 (⊃L () _ _)
-      lem3 (⊥L ()) 
-      lem3 (◇L () _)
-      lem3 (□L () _)
+      lem1 : ◇ ⊥ at β :: ⊥ at γ :: [] ⇒ ⊥ [ β ] → Void 
+      lem1 (□L (S (S ())) _) 
+      lem1 (⊃L (S (S ())) _ _)
+      lem1 (⊥L (S (S ())))
+      lem1 (◇L (S (S ())) _)
+      lem1 (◇L Z D) = lem1 (D βγ (⊥L (S Z)))
 
 {-
-      lem2 : ∀{w} → α ≺ w → (◇ (◇ Q) at α :: ⇒ Q [ w ] → [] ⇒ Q [ w ]
-      lem2 = {!!}
-  -}    
-      lem1 : [ ◇ (◇ Q) at α ] ⇒ ◇ Q [ α ] → Void
-      lem1 (⊃L (S ()) _ _)
-      lem1 (⊥L (S ())) 
-      lem1 (◇R ω D) = lem3 {!!} -- (lem2 ω D)
-      lem1 (◇L Z D) = {!!}
-      lem1 (◇L (S ()) _)
-      lem1 (□L (S ()) _)
+   ax4◇ : P at β :: (P ⊃ ◇ Q) at β :: [] ⇒ ◇ (◇ Q) ⊃ ◇ Q [ α ] → Void
+   ax4◇ (⊃L (S (S ())) _ _)
+   ax4◇ (⊥L (S (S ()))) 
+   ax4◇ (◇L (S (S ())) _)
+   ax4◇ (□L (S (S ())) _)
+   ax4◇ (⊃R (⊃L (S (S (S ()))) _ _))
+   ax4◇ (⊃R (⊥L (S (S (S ())))))
+   ax4◇ (⊃R (◇L (S (S (S ()))) _))
+   ax4◇ (⊃R (□L (S (S (S ()))) _))
+
+   ax4◇ (⊃R (◇R αβ D)) = {!!}
+
+   ax4◇ (⊃R (◇R αγ D)) = lem2 D
+    where
+      lem2 : ◇ (◇ Q) at α :: P at β :: (P ⊃ ◇ Q) at β :: [] ⇒ Q [ γ ] → Void
+      lem2 (hyp (S (S (S ()))))
+      lem2 (⊃L (S (S (S ()))) _ _)
+      lem2 (⊥L (S (S (S ())))) 
+      lem2 (◇L (S (S (S ()))) _)
+      lem2 (□L (S (S (S ()))) _)
+
+   ax4◇ (⊃R (◇L Z D)) = {!!} 
+   ax4◇ (⊃R D) = lem1 D
+    where
+      Γ = (◇ (◇ Q) at α :: P at β :: (P ⊃ ◇ Q) at β :: []) 
+
+      lem3 : ∀{s} 
+         → Seq β Γ [ ◇ (◇ Q) at α ] s Q 
+         → Void
+      lem3 (SEQUENT.hyp' (S (S (S ()))))
+      lem3 (SEQUENT.⊃L' (S (S Z)) D E) = {!!}
+      lem3 (SEQUENT.⊃L' (S (S (S ()))) _ _)
+      lem3 (SEQUENT.⊥L' (S (S (S ())))) 
+      lem3 (SEQUENT.◇L' (S (S (S ()))) _ _)
+      lem3 (SEQUENT.□L' (S (S (S ()))) _ _)
+
+      lem2 : Γ ⇒ Q [ γ ] → Void
+      lem2 (hyp (S (S (S ()))))
+      lem2 (⊃L (S (S (S ()))) _ _)
+      lem2 (⊥L (S (S (S ())))) 
+      lem2 (◇L (S (S (S ()))) _)
+      lem2 (□L (S (S (S ()))) _)
+
+      lem1 : Γ ⇒ ◇ Q [ α ] → Void
+      lem1 (⊃L (S (S (S ()))) _ _)
+      lem1 (⊥L (S (S (S ())))) 
+      lem1 (◇L (S (S (S ()))) _)
+      lem1 (□L (S (S (S ()))) _)
+      lem1 (◇R αγ D') = lem2 D' 
+      lem1 (◇L Z D) = lem1 (D αβ (nd→seq (⊃E (hyp (S (S Z))) (hyp (S Z)))))
+      lem1 (◇R αβ D') = lem3 (snd (→m refl D'))
+
+
+      -- s = fst (SEQUENT.→m refl  
+      lem3 : Seq β Γ Γ s Q
+
+⇒ Q [ β ] → Void
+      lem3 (hyp (S (S (S ()))))
+      lem3 (⊃L (S (S (S ()))) _ _)
+      lem3 (⊥L (S (S (S ())))) 
+      lem3 (◇L (S (S (S ()))) _)
+      lem3 (□L (S (S (S ()))) _)
+      lem3 (⊃L (S (S Z)) D E) = {!D!}
+--       lem2 D = {!!} 
+      lem1 : ◇ (◇ Q) at α :: ◇ Q at β :: [] ⇒ ◇ Q [ α ] → Void
+      lem1 (⊃L (S (S ())) _ _)
+      lem1 (⊥L (S (S ()))) 
+      lem1 (◇R ω D) = {!!} -- lem2 (wk-seq (wkto ω) D)
+      lem1 (◇L Z D) = lem1 (D αβ {!!})
+      lem1 (◇L (S (S ())) _)
+      lem1 (□L (S (S ())) _)
+
+      lem2 : [ ◇ Q at β ] ⇒ Q [ β ] → Void
+      lem2 (hyp (S ()))
+      lem2 (⊃L (S ()) _ _)
+      lem2 (⊥L (S ())) 
+      lem2 (◇L (S ()) _)
+      lem2 (□L (S ()) _)
+      lem2 (◇L Z D) = lem2 (D βγ {!lem3!})
+
+      lem3 : [ ◇ Q at β ] ⇒ Q [ γ ] → Void
+      lem3 (hyp (S ()))
+      lem3 (⊃L (S ()) _ _)
+      lem3 (⊥L (S ())) 
+      lem3 (◇L (S ()) _)
+      lem3 (□L (S ()) _)
+-}
 
    axIK : [] ⇒ (◇ Q ⊃ □ ⊥) ⊃ □ (Q ⊃ ⊥) [ β ] → Void
-   axIK D = {!!} 
+   axIK (⊃R (⊃L (S ()) D₁ D₂))
+   axIK (⊃R (⊥L (S ())))
+   axIK (⊃R (◇L (S ()) D₁))
+   axIK (⊃R (□L (S ()) D₁))
+   axIK (⊃L () D₁ D₂)
+   axIK (⊥L ())
+   axIK (◇L () D₁) 
+   axIK (□L () D₁)
+   axIK (⊃R (⊃L Z D₁ D₂)) = lem1 D₁
+    where
+      lem2 : ((◇ Q ⊃ □ ⊥) at β :: []) ⇒ Q [ γ ] → Void
+      lem2 (hyp (S ()))
+      lem2 (⊃L (S ()) D₁' D₂)
+      lem2 (⊥L (S ()))
+      lem2 (◇L (S ()) D₁')
+      lem2 (□L (S ()) D₁') 
+     
+      lem1 : ((◇ Q) ⊃ □ ⊥) at β :: [] ⇒ (◇ Q) [ β ] → Void
+      lem1 (⊃L Z D₁' D₂) = lem1 D₁'
+      lem1 (⊃L (S ()) D₁' D₂)
+      lem1 (⊥L (S ())) 
+      lem1 (◇R βγ D₁') = lem2 D₁'
+      lem1 (◇L (S ()) D₁')
+      lem1 (□L (S ()) D₁') 
 
-   -- De Morgan dualities (Theorem 3.6)
+   axIK (⊃R (□R D)) = lem1 (D βγ)
+    where
+      lem2 : (Q at γ :: (◇ Q ⊃ □ ⊥) at β :: []) ⇒ ⊥ [ γ ] → Void
+      lem2 (⊃L (S (S ())) _ _)
+      lem2 (⊥L (S (S ())))
+      lem2 (◇L (S (S ())) _)
+      lem2 (□L (S (S ())) _) 
+
+      lem1 : ((◇ Q ⊃ □ ⊥) at β :: []) ⇒ (Q ⊃ ⊥) [ γ ] → Void
+      lem1 (⊃R D₁) = lem2 D₁
+      lem1 (⊃L (S ()) D₁ D₂)
+      lem1 (⊥L (S ()))
+      lem1 (◇L (S ()) D₁)
+      lem1 (□L (S ()) D₁)
+
+ -- De Morgan laws (Theorem 3.6)
+   ax◇¬ : [ ⊥ at γ ] ⇒ ◇ (¬ Q) ⊃ ¬ (□ Q) [ β ] → Void
+   ax◇¬ (⊃L (S ()) _ _)
+   ax◇¬ (⊥L (S ())) 
+   ax◇¬ (◇L (S ()) _)
+   ax◇¬ (□L (S ()) _)
+   ax◇¬ (⊃R D) = lem1 D
+    where
+     mutual
+      lem1 : ◇ (¬ Q) at β :: ⊥ at γ :: [] ⇒ ¬ (□ Q) [ β ] → Void
+      lem1 (⊃L (S (S ())) _ _)
+      lem1 (⊥L (S (S ()))) 
+      lem1 (◇L (S (S ())) _)
+      lem1 (□L (S (S ())) _)
+      lem1 (◇L Z D) = lem1 (D βγ (⊃R (⊥L (S (S Z)))))
+      lem1 (⊃R D) = lem2 D
+ 
+      lem2 : □ Q at β :: ◇ (¬ Q) at β :: ⊥ at γ :: [] ⇒ ⊥ [ β ] → Void
+      lem2 (⊃L (S (S (S ()))) _ _)
+      lem2 (⊥L (S (S (S ())))) 
+      lem2 (◇L (S (S (S ()))) _)
+      lem2 (□L (S (S (S ()))) _)
+      lem2 (□L Z D) = lem2 (D lem3)
+      lem2 (◇L (S Z) D) = lem2 (D βγ (⊥L (S (S Z))))
+
+      lem3 : ∀{w'} → β ≺ w' 
+         → □ Q at β :: ◇ (¬ Q) at β :: ⊥ at γ :: [] ⇒ Q [ w' ] 
+      lem3 βγ = ⊥L (S (S Z))
+ 
+   ax□¬ : [ ⊥ at γ ] ⇒ □ (¬ Q) ⊃ ¬ (◇ Q) [ β ] → Void
+   ax□¬ (⊃L (S ()) _ _)
+   ax□¬ (⊥L (S ())) 
+   ax□¬ (◇L (S ()) _)
+   ax□¬ (□L (S ()) _)
+   ax□¬ (⊃R D) = lem1 D
+    where
+     mutual
+      lem1 : □ (¬ Q) at β :: ⊥ at γ :: [] ⇒ ¬ (◇ Q) [ β ] → Void
+      lem1 (⊃L (S (S ())) _ _)
+      lem1 (⊥L (S (S ()))) 
+      lem1 (◇L (S (S ())) _)
+      lem1 (□L (S (S ())) _)
+      lem1 (□L Z D) = lem1 (D (λ ω → lem3 ω (S Z)))
+      lem1 (⊃R D) = lem2 D
+
+      lem2 : ◇ Q at β :: □ (¬ Q) at β :: ⊥ at γ :: [] ⇒ ⊥ [ β ] → Void
+      lem2 (⊃L (S (S (S ()))) _ _)
+      lem2 (⊥L (S (S (S ())))) 
+      lem2 (◇L (S (S (S ()))) _)
+      lem2 (□L (S (S (S ()))) _)
+      lem2 (◇L Z D) = lem2 (D βγ (⊥L (S (S Z))))
+      lem2 (□L (S Z) D) = lem2 (D (λ ω → lem3 ω (S (S Z))))
+
+      lem3 : ∀{Γ A w'} → β ≺ w' → ⊥ at γ ∈ Γ → Γ ⇒ A [ w' ]
+      lem3 βγ x = ⊥L x
+
    ax¬□ : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ α ] → Void
    ax¬□ D = {!!}
 
-   ax□¬ : [ Q at α ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ α ] → Void
-   ax□¬ D = {!!}
+   ax¬◇ : [ Q at α ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ α ] → Void
+   ax¬◇ D = {!!}
 
