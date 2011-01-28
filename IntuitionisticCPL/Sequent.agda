@@ -1,5 +1,5 @@
 -- Constructive Provability Logic 
--- The minimal, modal, propositional fragment
+-- Tethered intuitionstic variant
 -- Robert J. Simmons, Bernardo Toninho
 
 -- Soundness and completeness of the sequent calculus
