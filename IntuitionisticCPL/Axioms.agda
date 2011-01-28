@@ -7,7 +7,7 @@
 module IntuitionisticCPL.Axioms where
 open import Prelude hiding (⊥ ; ¬)
 open import Accessibility.Inductive
-open import Accessibility.Five
+open import Accessibility.Three
 open import Accessibility.IndexedList
 open import IntuitionisticCPL.Core
 open import IntuitionisticCPL.Sequent
@@ -107,26 +107,31 @@ module AXIOMS (UWF : UpwardsWellFounded) where
    ax◇¬ : ∀{Γ A w} 
       → Con Γ w 
       → Γ ⊢ ◇ (¬ A) ⊃ ¬ (□ A) [ w ]
-   ax◇¬ con = ⊃I {!!}
+   ax◇¬ con = ⊃I (◇E (hyp Z) 
+      λ ω D₀ → ⊃I (□E (hyp Z) 
+      λ D₁ → abort (con ω (wk-nd (wkto ω) (⊃E D₀ (wk-nd (wkto ω) (D₁ ω)))))))
 
    ax□¬ : ∀{Γ A w} 
       → Con Γ w 
       → Γ ⊢ □ (¬ A) ⊃ ¬ (◇ A) [ w ]
-   ax□¬ con = ⊃I {!!}
+   ax□¬ con = ⊃I (□E (hyp Z)
+      λ D₀ → ⊃I (◇E (hyp Z)
+      λ ω D₁ → 
+       abort (con ω (wk-nd (wkto ω) (⊃E (D₀ ω) (wk-nd (wkto ω) D₁))))))
     
 module NON-AXIOMS where
-   open TRANS-UWF Example
-   open PROPERTIES Example
-   open ILIST Example
-   open CORE Example
-   open SEQUENT Example
-   open EQUIV Example
+   open TRANS-UWF SmallExample
+   open PROPERTIES SmallExample
+   open ILIST SmallExample
+   open CORE SmallExample
+   open SEQUENT SmallExample
+   open EQUIV SmallExample
 
    Q : Type
    Q = a "Q"   
 
    -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
-   ax◇⊥ : [ ⊥ at δ ] ⇒ ¬ (◇ ⊥) [ β ] → Void
+   ax◇⊥ : [ ⊥ at γ ] ⇒ ¬ (◇ ⊥) [ β ] → Void
    ax◇⊥ D = {!!}
 
    ax4□ : [] ⇒ ◇ (◇ Q) ⊃ ◇ Q [ α ] → Void
