@@ -107,7 +107,7 @@ module AXIOMS (UWF : UpwardsWellFounded) where
       → Con Γ w 
       → Γ ⊢ □ (¬ A) ⊃ ¬ (◇ A) [ w ]
    ax□¬ con = ⊃I {!!}
-   
+    
 module NON-AXIOMS where
    open TRANS-UWF Example
    open PROPERTIES Example
