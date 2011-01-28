@@ -79,14 +79,14 @@ module EXAMPLE where
    ind P iH δ = iH δ (λ w' ())
    ind P iH ε = iH ε (λ w' ())
 
-   Arbitrary : UpwardsWellFounded
-   Arbitrary = record
+   Example : UpwardsWellFounded
+   Example = record
      {W = Five;
       _≺_ = _≺_;
       _≡?_ = _≡?_;
       ind = ind}
 
-open EXAMPLE public using (Arbitrary)
+open EXAMPLE public using (Example)
 
 module WIDE where
    -- Wide five-element accessibility relation (and its transitive closure)
