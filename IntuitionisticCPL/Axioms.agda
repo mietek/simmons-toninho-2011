@@ -98,121 +98,17 @@ module AXIOMS (UWF : UpwardsWellFounded) where
    Löb {A = A} D = {!!}
 
    -- De Morgan dualities (Theorem 3.6)
-   demorgan2 : ∀{Γ A w} 
+   ax◇¬ : ∀{Γ A w} 
       → Con Γ w 
       → Γ ⊢ ◇ (¬ A) ⊃ ¬ (□ A) [ w ]
-   demorgan2 con = ⊃I {!!}
-   
+   ax◇¬ con = ⊃I {!!}
 
+   ax□¬ : ∀{Γ A w} 
+      → Con Γ w 
+      → Γ ⊢ □ (¬ A) ⊃ ¬ (◇ A) [ w ]
+   ax□¬ con = ⊃I {!!}
+   
 module NON-AXIOMS where
-   open TRANS-UWF Example
-   open PROPERTIES Example
-   open ILIST Example
-   open CORE Example
-   open SEQUENT Example
-   open EQUIV Example
-
-{-
-   Con : MCtx → W → Set
-   Con Γ w = ∀ {w'} → w ≺ w' → Γ ⇒ ⊥ [ w' ] → Void
-
-   Empty : MCtx → W → Set
-   Empty Γ w = ∀ {A} → A at w ∈ Γ → Void
-
-   DecideA : MCtx → Type → W → Set
-   DecideA Γ A w = Sum 
-      (∀ {w'} → w ≺ w' → Γ ⇒ A [ w' ])
-      (∃ λ w' → (w ≺ w') × (Γ ⇒ A [ w' ] → Void))
-
-   Decide¬A : MCtx → Type → W → Set
-   Decide¬A Γ A w = Sum 
-      (∀ {w'} → w ≺ w' → Γ ⇒ A [ w' ] → Void)
-      (∃ λ w' → (w ≺ w') × (Γ ⇒ A [ w' ]))
-
-   DecideA-InCPL : MCtx → Type → W → Set
-   DecideA-InCPL Γ A w = Sum 
-      (∀ {w'} → w ≺ w' → Γ ⇒ A [ w' ])
-      (∃ λ w' → (w ≺ w') × (Γ ⇒ ¬ A [ w' ]))
-
-   Decide¬A-InCPL : MCtx → Type → W → Set
-   Decide¬A-InCPL Γ A w = Sum 
-      (∀ {w'} → w ≺ w' → Γ ⇒ ¬ A [ w' ])
-      (∃ λ w' → (w ≺ w') × (Γ ⇒ A [ w' ]))
-
-
-   Decide◇A-InCPL : MCtx → Type → W → Set
-   Decide◇A-InCPL Γ A w = Sum 
-      (∀ {w'} → w ≺ w' → (Γ ⇒ ¬ A [ w' ] → Void) → (¬□ (A ⊃ ⊥)) at w :: Γ ⇒ ◇ A [ w ])           
-      (∃ λ w' → (w ≺ w') × (Γ ⇒ A [ w' ]))
--}
-
-
-
-
-module SOUNDNESS (UWF : UpwardsWellFounded) where
-   open TRANS-UWF UWF
-   open PROPERTIES UWF
-   open ILIST UWF
-   open CORE UWF 
-   open SEQUENT UWF
-   open EQUIV UWF
-
-{-
-   -- Valid Axioms
-   I : ∀{Γ A w} 
-      → Γ ⊢ A ⊃ A [ w ]
-   I = 
-
-
-   -- Axioms of IK, Simpson's intuitionstic modal logic (Theorem 3.3)
-   validaxioms □K con = ⊃I (⊃I (□E (hyp (S Z))
-      λ DAB → □E (hyp Z) 
-      λ DA → □I (λ ω → ⊃E (DAB ω) (DA ω))))
-   validaxioms ◇K con = ⊃I (⊃I (□E (hyp (S Z)) 
-      λ DAB → ◇E (hyp Z) 
-      λ ω DA → ◇I ω (⊃E (DAB ω) DA)))
-   validaxioms ¬□K con = ⊃I (⊃I (□E (hyp (S Z)) 
-      λ DAB → ¬□E (hyp Z) 
-      λ ω DB → ¬□I ω (λ DA → DB (⊃E (DAB ω) DA))))
-   validaxioms ¬◇K con = ⊃I (⊃I (□E (hyp (S Z)) 
-      λ DAB → ¬◇E (hyp Z) 
-      λ DB → ¬◇I (λ ω DA → DB ω (⊃E (DAB ω) DA))))
-
-   -- Negation in CPL
-   validaxioms □N con = ⊃I (⊃I (□E (hyp Z) 
-      λ DA → ¬□E (hyp (S Z)) 
-      λ ω ¬DA → abort (¬DA (DA ω))))
-   validaxioms ◇N con = ⊃I (⊃I (◇E (hyp Z)
-      λ ω DA → ¬◇E (hyp (S Z))
-      λ ¬DA → abort (¬DA ω DA)))
-   validaxioms □C con =
-      ⊃I (□E (hyp Z) (λ D → ¬◇I (λ ω D0 → con ω (⊃E D0 (D ω)))))
-   validaxioms ◇C con = 
-      ⊃I (◇E (hyp Z) (λ ω D → ¬□I ω (λ D' → con ω (⊃E D' D))))
-
-
-
-   -- Valid axioms in a transitive accessibility relation
-   validtrans : ∀{Γ A w} 
-      → Trans
-      → (∀ {w'} → w ≺ w' → Γ ⊢ ⊥ [ w ] → Void) 
-      → TransAxiom A 
-      → Γ ⊢ A [ w ]
-   validtrans _≺≺_ con □4 = ⊃I (□E (hyp Z) 
-      λ D → □I λ ω → □I λ ω' → D (ω ≺≺ ω'))
-   validtrans _≺≺_ con (GL {A}) = ind P lemma _
-    where
-      P : W → Set
-      P = λ w → ∀{Γ} → Γ ⊢ □ (□ A ⊃ A) ⊃ □ A [ w ]
-   
-      lemma : (w : W) → ((w' : W) → w ≺ w' → P w') → P w
-      lemma w ih = ⊃I (□E (hyp Z) 
-         λ DInd → □I 
-         λ ω → ⊃E (DInd ω) (⊃E (ih _ ω) (□I (λ ω' → DInd (ω ≺≺ ω')))))
-
--}
-
-module NOT-4□ where
    open TRANS-UWF Example
    open PROPERTIES Example
    open ILIST Example
@@ -223,14 +119,18 @@ module NOT-4□ where
    Q : Type
    Q = a "Q"   
 
-   4□ : [] ⇒ ◇ (◇ Q) ⊃ ◇ Q [ α ] → Void
-   4□ (⊃L () _ _)
-   4□ (⊥L ()) 
-   4□ (◇L () _)
-   4□ (□L () _)
-   4□ (¬◇L () _) 
-   4□ (¬□L () _) 
-   4□ (⊃R D) = {!!}
+   -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
+   ax◇⊥ : [ ⊥ at δ ] ⇒ ¬ (◇ ⊥) [ β ] → Void
+   ax◇⊥ D = {!!}
+
+   ax4□ : [] ⇒ ◇ (◇ Q) ⊃ ◇ Q [ α ] → Void
+   ax4□ (⊃L () _ _)
+   ax4□ (⊥L ()) 
+   ax4□ (◇L () _)
+   ax4□ (□L () _)
+   ax4□ (¬◇L () _) 
+   ax4□ (¬□L () _) 
+   ax4□ (⊃R D) = {!!}
     where
       lem3 : ∀{w} → [] ⇒ Q [ w ] → Void
       lem3 (hyp ())
@@ -254,3 +154,14 @@ module NOT-4□ where
       lem1 (□L (S ()) _)
       lem1 (¬◇L (S ()) _) 
       lem1 (¬□L (S ()) _) 
+
+   axIK : [] ⇒ (◇ Q ⊃ □ ⊥) ⊃ □ (Q ⊃ ⊥) [ β ] → Void
+   axIK D = {!!} 
+
+   -- De Morgan dualities (Theorem 3.6)
+   ax¬□ : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ α ] → Void
+   ax¬□ D = {!!}
+
+   ax□¬ : [ Q at α ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ α ] → Void
+   ax□¬ D = {!!}
+
