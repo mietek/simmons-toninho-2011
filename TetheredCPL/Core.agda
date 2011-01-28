@@ -9,7 +9,7 @@
 -- the accessibility relation preserves the consistency of Agda.
 {-# OPTIONS --no-positivity-check #-}
 
-module IntuitionisticCPL.Core where
+module TetheredCPL.Core where
 open import Prelude hiding (⊥)
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
@@ -22,8 +22,6 @@ data Type : Set where
    _⊃_ : (A B : Type) → Type
    ◇   : (A : Type) → Type
    □   : (A : Type) → Type
-   ¬◇  : (A : Type) → Type
-   ¬□  : (A : Type) → Type
 
 module CORE (UWF : UpwardsWellFounded) where 
    open UpwardsWellFounded UWF
@@ -62,21 +60,6 @@ module CORE (UWF : UpwardsWellFounded) where
       □E : ∀{Γ A C w}
          → Γ ⊢ □ A [ w ]
          → ((∀{w'} → w ≺ w' → Γ ⊢ A [ w' ]) → Γ ⊢ C [ w ])
-         → Γ ⊢ C [ w ]
-      ¬◇I : ∀{Γ A w}
-         → (∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Void)
-         → Γ ⊢ ¬◇ A [ w ]
-      ¬◇E : ∀{Γ A C w}
-         → Γ ⊢ ¬◇ A [ w ]
-         → ((∀{w'} → w ≺ w' → Γ ⊢ A [ w' ] → Void) → Γ ⊢ C [ w ])
-         → Γ ⊢ C [ w ]
-      ¬□I : ∀{Γ A w w'}
-         → w ≺ w'
-         → (Γ ⊢ A [ w' ] → Void)
-         → Γ ⊢ ¬□ A [ w ]
-      ¬□E : ∀{Γ A C w}
-         → Γ ⊢ ¬□ A [ w ] 
-         → (∀{w'} → w ≺ w' → (Γ ⊢ A [ w' ] → Void) → Γ ⊢ C [ w ])
          → Γ ⊢ C [ w ]
 
    -- The alternate, "more natural" □E rule is derivable
@@ -119,21 +102,6 @@ module CORE (UWF : UpwardsWellFounded) where
          → (□ A) at w ∈ Γ
          → ((∀{w'} → w ≺ w' → Γ ⇒ A [ w' ]) → Γ ⇒ C [ w ])
          → Γ ⇒ C [ w ]
-      ¬◇R : ∀{Γ A w}
-         → (∀{w'} → w ≺ w' → Γ ⇒ A [ w' ] → Void)
-         → Γ ⇒ ¬◇ A [ w ]
-      ¬◇L : ∀{Γ A C w}
-         → (¬◇ A) at w ∈ Γ
-         → ((∀{w'} → w ≺ w' → Γ ⇒ A [ w' ] → Void) → Γ ⇒ C [ w ])
-         → Γ ⇒ C [ w ]
-      ¬□R : ∀{Γ A w w'}
-         → w ≺ w'
-         → (Γ ⇒ A [ w' ] → Void)
-         → Γ ⇒ ¬□ A [ w ] 
-      ¬□L : ∀{Γ A w C}
-         → (¬□ A) at w ∈ Γ
-         → (∀{w'} → w ≺ w' → (Γ ⇒ A [ w' ] → Void) → Γ ⇒ C [ w ])
-         → Γ ⇒ C [ w ]
 
    -- Core metric
    -- The metric could be split, one for the sequent calculus and one for the 
@@ -151,11 +119,3 @@ module CORE (UWF : UpwardsWellFounded) where
           → ((∀{w'} → w ≺ w' → Δ ⇒ A [ w' ]) → Shape Δ w) → Shape Δ w
       s□⊢ : ∀{A} 
           → ((∀{w'} → w ≺ w' → Δ ⊢ A [ w' ]) → Shape Δ w) → Shape Δ w
-      s¬◇⇒ : ∀{A} 
-          → ((∀{w'} → w ≺ w' → Δ ⇒ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
-      s¬◇⊢ : ∀{A} 
-          → ((∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
-      s¬□⇒ : ∀{A} 
-          → (∀{w'} → w ≺ w' → (Δ ⇒ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
-      s¬□⊢ : ∀{A} 
-          → (∀{w'} → w ≺ w' → (Δ ⊢ A [ w' ] → Void) → Shape Δ w) → Shape Δ w
