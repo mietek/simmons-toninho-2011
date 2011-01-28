@@ -4,11 +4,11 @@
 
 -- Natural deduction and substitution
 
-module IntuitionisticCPL.NatDeduction where
+module TetheredCPL.NatDeduction where
 open import Prelude hiding (⊥)
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
-open import IntuitionisticCPL.Core
+open import TetheredCPL.Core
 
 module NAT-DEDUCTION (UWF : UpwardsWellFounded) where 
    open TRANS-UWF UWF
@@ -32,17 +32,6 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    wk₁ w ih sub (□E D₁ D₂) = 
       □E (wk₁ w ih sub D₁) 
        (λ D₀ → wk₁ w ih sub (D₂ (λ ω → ih _ ω (⊆to/≺' ω sub) (D₀ ω))))
-   wk₁ w ih sub (¬◇I D) = 
-      ¬◇I (λ ω D₀ → D ω (ih _ ω (⊆to/≺' ω sub) D₀))
-   wk₁ w ih sub (¬◇E D₁ D₂) =
-      ¬◇E (wk₁ w ih sub D₁) 
-       (λ D₀ → 
-        wk₁ w ih sub (D₂ (λ ω D → D₀ ω (ih _ ω (⊆to/≺ ω sub) D))))
-   wk₁ w ih sub (¬□I ω D) = ¬□I ω (λ D₀ → D (ih _ ω (⊆to/≺' ω sub) D₀))
-   wk₁ w ih sub (¬□E D₁ D₂) =
-      ¬□E (wk₁ w ih sub D₁) 
-       (λ ω D₀ → 
-        wk₁ w ih sub (D₂ ω (λ D → D₀ (ih _ ω (⊆to/≺ ω sub) D))))
 
    wk : ∀{Γ Γ' w A}
       → Γ ⊆ Γ' to w
@@ -82,24 +71,6 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
          → (s : (∀{w'} → w ≺ w' → Δ ⊢ A [ w' ]) → Shape Δ w)
          → ((D₀ : ∀{w'} → w ≺ w' → Δ ⊢ A [ w' ]) → ND w Γ Δ (s D₀) C)
          → ND w Γ Δ (s2 s₀ (s□⊢ s)) C
-      ¬◇I' : ∀{w A Γ Δ}
-         → (∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) 
-         → ND w Γ Δ s0 (¬◇ A) 
-      ¬◇E' : ∀{w A Γ Δ C s₀}
-         → ND w Γ Δ s₀ (¬◇ A)
-         → (s : (∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) → Shape Δ w)
-         → ((D₀ : ∀{w'} → w ≺ w' → Δ ⊢ A [ w' ] → Void) → ND w Γ Δ (s D₀) C)
-         → ND w Γ Δ (s2 s₀ (s¬◇⊢ s)) C
-      ¬□I' : ∀{Γ Δ A w w'}
-         → w ≺ w'
-         → (Δ ⊢ A [ w' ] → Void)
-         → ND w Γ Δ s0 (¬□ A)
-      ¬□E' : ∀{Γ Δ A C w s₀}
-         → ND w Γ Δ s₀ (¬□ A)
-         → (s : ∀{w'} → w ≺ w' → (Δ ⊢ A [ w' ] → Void) → Shape Δ w)
-         → (∀{w'} (ω : w ≺ w') (D₀ : Δ ⊢ A [ w' ] → Void)
-            → ND w Γ Δ (s ω D₀) C)
-         → ND w Γ Δ (s2 s₀ (s¬□⊢ s)) C
 
    -- Getting in and out of the metric
    m→ : ∀{Γ Δ w A s} → Δ ⊆ Γ to w → ND w Γ Δ s A → Γ ⊢ A [ w ]
@@ -114,14 +85,6 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    m→ sub (□E' DA s D) = 
       □E (m→ sub DA) 
        (λ D₀ → m→ sub (D (λ ω → wk (⊆to/≺' ω sub) (D₀ ω))))
-   m→ sub (¬◇I' D) = ¬◇I (λ ω D₀ → D ω (wk (⊆to/≺' ω sub) D₀))
-   m→ sub (¬◇E' DA s D) = 
-      ¬◇E (m→ sub DA) 
-       (λ D₀ → m→ sub (D (λ ω D' → D₀ ω (wk (⊆to/≺ ω sub) D'))))
-   m→ sub (¬□I' ω D) = ¬□I ω (λ D₀ → D (wk (⊆to/≺' ω sub) D₀))
-   m→ sub (¬□E' DA s D) = 
-      ¬□E (m→ sub DA) 
-       (λ ω D₀ → m→ sub (D ω (λ D' → D₀ (wk (⊆to/≺ ω sub) D'))))
 
    →m : ∀{Γ w Δ A} → (Γ ↓ w) ≡ Δ → Γ ⊢ A [ w ] → ∃ λ s → ND w Γ Δ s A
    →m Refl (hyp iN) = , hyp' iN
@@ -137,14 +100,6 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    →m {Γ} Refl (□E D₁ D₂) = , 
       □E' (snd (→m refl D₁)) _
        (λ D₀ → snd (→m refl (D₂ (λ ω → wk (⊆to/≺ ω (⊆to/↓ Γ)) (D₀ ω)))))
-   →m Refl (¬◇I D) = , ¬◇I' (λ ω D₀ → D ω (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))
-   →m Refl (¬◇E D₁ D₂) = , 
-      ¬◇E' (snd (→m refl D₁)) _ 
-       (λ D₀ → snd (→m refl (D₂ (λ ω D' → D₀ ω (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
-   →m Refl (¬□I ω D) = , ¬□I' ω (λ D₀ → D (wk (⊆to/≺ ω (⊆to/↓ _)) D₀))
-   →m Refl (¬□E D₁ D₂) = , 
-      ¬□E' (snd (→m refl D₁)) _ 
-       (λ ω D₀ → snd (→m refl (D₂ ω (λ D' → D₀ (wk (⊆to/↓≺ _ (≺+0 ω)) D')))))
 
    -- Weakening (inside the metric)
    wk' : ∀{Γ Γ' w Δ s A}
@@ -159,10 +114,6 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    wk' sub (◇E' D₁ s D₂) = ◇E' (wk' sub D₁) s (λ ω D₀ → wk' sub (D₂ ω D₀)) 
    wk' sub (□I' D) = □I' D
    wk' sub (□E' D₁ s D₂) = □E' (wk' sub D₁) s (λ D₀ → wk' sub (D₂ D₀))
-   wk' sub (¬◇I' D) = ¬◇I' D
-   wk' sub (¬◇E' D₁ s D₂) = ¬◇E' (wk' sub D₁) s (λ D₀ → wk' sub (D₂ D₀))
-   wk' sub (¬□I' ω D) = ¬□I' ω D
-   wk' sub (¬□E' D₁ s D₂) = ¬□E' (wk' sub D₁) s (λ ω D₀ → wk' sub (D₂ ω D₀))
  
    -- Substitution theorem
    subst' : ∀{Γ Δ w A s₁ s₂ C} 
@@ -180,12 +131,6 @@ module NAT-DEDUCTION (UWF : UpwardsWellFounded) where
    subst' D (□I' D₁) = , □I' D₁
    subst' D (□E' D₁ s D₂) = , 
       □E' (snd (subst' D D₁)) _ (λ D₀ → snd (subst' D (D₂ D₀)))
-   subst' D (¬◇I' D₁) = , ¬◇I' D₁
-   subst' D (¬◇E' D₁ s D₂) = , 
-      ¬◇E' (snd (subst' D D₁)) _ (λ D₀ → snd (subst' D (D₂ D₀)))
-   subst' D (¬□I' ω D₁) = , ¬□I' ω D₁
-   subst' D (¬□E' D₁ s D₂) = , 
-      ¬□E' (snd (subst' D D₁)) _ (λ ω D₀ → snd (subst' D (D₂ ω D₀)))
 
    subst : ∀{Γ A w C} 
       → Γ ⊢ A [ w ] 

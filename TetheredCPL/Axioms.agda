@@ -4,14 +4,14 @@
 
 -- Valid and invalid axioms
 
-module IntuitionisticCPL.Axioms where
+module TetheredCPL.Axioms where
 open import Prelude hiding (⊥ ; ¬)
 open import Accessibility.Inductive
 open import Accessibility.Three
 open import Accessibility.IndexedList
-open import IntuitionisticCPL.Core
-open import IntuitionisticCPL.Sequent
-open import IntuitionisticCPL.Equiv
+open import TetheredCPL.Core
+open import TetheredCPL.Sequent
+open import TetheredCPL.Equiv
 
 ¬ : Type → Type
 ¬ A = A ⊃ ⊥
@@ -139,8 +139,6 @@ module NON-AXIOMS where
    ax4□ (⊥L ()) 
    ax4□ (◇L () _)
    ax4□ (□L () _)
-   ax4□ (¬◇L () _) 
-   ax4□ (¬□L () _) 
    ax4□ (⊃R D) = {!!}
     where
       lem3 : ∀{w} → [] ⇒ Q [ w ] → Void
@@ -149,8 +147,6 @@ module NON-AXIOMS where
       lem3 (⊥L ()) 
       lem3 (◇L () _)
       lem3 (□L () _)
-      lem3 (¬◇L () _) 
-      lem3 (¬□L () _) 
 
 {-
       lem2 : ∀{w} → α ≺ w → (◇ (◇ Q) at α :: ⇒ Q [ w ] → [] ⇒ Q [ w ]
@@ -163,8 +159,6 @@ module NON-AXIOMS where
       lem1 (◇L Z D) = {!!}
       lem1 (◇L (S ()) _)
       lem1 (□L (S ()) _)
-      lem1 (¬◇L (S ()) _) 
-      lem1 (¬□L (S ()) _) 
 
    axIK : [] ⇒ (◇ Q ⊃ □ ⊥) ⊃ □ (Q ⊃ ⊥) [ β ] → Void
    axIK D = {!!} 

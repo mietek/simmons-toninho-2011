@@ -4,13 +4,13 @@
 
 -- Equivalence of sequent calculus and natural deduction
 
-module IntuitionisticCPL.Equiv where
+module TetheredCPL.Equiv where
 open import Prelude
 open import Accessibility.Inductive
 open import Accessibility.IndexedList
-open import IntuitionisticCPL.Core
-open import IntuitionisticCPL.NatDeduction
-open import IntuitionisticCPL.Sequent
+open import TetheredCPL.Core
+open import TetheredCPL.NatDeduction
+open import TetheredCPL.Sequent
 
 module EQUIV (UWF : UpwardsWellFounded) where
    open TRANS-UWF UWF
@@ -53,16 +53,6 @@ module EQUIV (UWF : UpwardsWellFounded) where
       cut (nd→seq' w ih D)
        (□L Z (λ D₀ → wk-seq wken (nd→seq' w ih 
         (D' (λ ω → snd (ih _ ω) (wk-seq (wkto ω) (D₀ ω)))))))
-   nd→seq' w ih (¬◇I D) = ¬◇R (λ ω D₀ → D ω (snd (ih _ ω) D₀))
-   nd→seq' w ih (¬◇E D D') = 
-      cut (nd→seq' w ih D) 
-       (¬◇L Z (λ D₀ → wk-seq wken (nd→seq' w ih 
-        (D' (λ ω D'' → D₀ ω (fst (ih _ ω) (wk-nd (wkto' ω) D'')))))))
-   nd→seq' w ih (¬□I ω D') = ¬□R ω (λ D₀ → D' (snd (ih _ ω) D₀))
-   nd→seq' w ih (¬□E D D') = 
-      cut (nd→seq' w ih D)
-       (¬□L Z (λ ω D₀ → wk-seq wken (nd→seq' w ih 
-        (D' ω (λ D'' → D₀ (fst (ih _ ω) (wk-nd (wkto' ω) D'')))))))
 
    -- Given the induction hypothesis, sequent implies natural deduction
    seq→nd' : (w : W) → ((w' : W) → w ≺ w' → equivP w')
@@ -78,12 +68,6 @@ module EQUIV (UWF : UpwardsWellFounded) where
    seq→nd' w ih (□R D) = □I (λ ω → snd (ih _ ω) (D ω))
    seq→nd' w ih (□L iN D) = 
       □E (hyp iN) (λ D₀ → seq→nd' w ih (D (λ ω → fst (ih _ ω) (D₀ ω))))
-   seq→nd' w ih (¬◇R D) = ¬◇I (λ ω D₀ → D ω (fst (ih _ ω) D₀))
-   seq→nd' w ih (¬◇L iN D) = 
-      ¬◇E (hyp iN) (λ D₀ → seq→nd' w ih (D (λ ω D' → D₀ ω (snd (ih _ ω) D'))))
-   seq→nd' w ih (¬□R ω D) = ¬□I ω (λ D₀ → D (fst (ih _ ω) D₀))
-   seq→nd' w ih (¬□L iN D) = 
-      ¬□E (hyp iN) (λ ω D₀ → seq→nd' w ih (D ω (λ D' → D₀ (snd (ih _ ω) D'))))
 
    -- Therefore, both sequent calculus and natural deduction are equivalent
    nd⇆seq : (w : W) → 
