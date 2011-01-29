@@ -19,7 +19,6 @@ open import TetheredCPL.Equiv
 
 module PROPERTIES (UWF : UpwardsWellFounded) where
    open TRANS-UWF UWF
-   open ILIST UWF
    open CORE UWF 
 
    Trans : Set
@@ -33,8 +32,6 @@ module AXIOMS (UWF : UpwardsWellFounded) where
    open PROPERTIES UWF
    open ILIST UWF
    open CORE UWF 
-   open NAT-DEDUCTION UWF
-   open SEQUENT UWF
    open EQUIV UWF
 
  -- Axioms of intuitionstic propositional logic (Theorem 3.1)
@@ -78,21 +75,6 @@ module AXIOMS (UWF : UpwardsWellFounded) where
       → Γ ⊢ □ A ⊃ □ (□ A) [ w ]
    ax4□ _≺≺_ = ⊃I (□E (hyp Z) 
       λ D → □I λ ω → □I λ ω' → D (ω ≺≺ ω'))
-
- -- Attempting to prove ax4◇
-{-
-   trans◇ : ∀{Γ A w'} 
-      → Γ ⇒ ◇ A [ w' ] 
-      → ((A : Type) → Γ ⊢ A [ w' ]) + (∃ λ w'' → w' ≺ w'' × (Γ ⊢ A [ w'' ]))
-   trans◇ (⊃L x D E) with trans◇ E
-   ... | Inl D' = Inl (λ A → subst (⊃E (hyp x) (seq→nd D)) (D' A))
-   ... | Inr (w' , ω , D') = Inr (w' , ω , wk-nd (wkto ω) D')
-   trans◇ (⊥L x) = Inl (λ A → ⊥E (hyp x)) -- ◇R ω (⊥L x)
-   trans◇ (◇R ω' D) = Inr (_ , ω' , seq→nd D) -- ◇R (ω ≺≺ ω') D
-   trans◇ (◇L x D) with trans◇ (D {!!} {!!})
-   ... | z = {!!}
-   trans◇ (□L x D) = {!!}
--}
 
  -- Axiom GL (Theorem 3.4)
    axGL : ∀{Γ A w}
@@ -164,95 +146,6 @@ module NON-AXIOMS where
       lem1 (⊥L (S (S ())))
       lem1 (◇L (S (S ())) _)
       lem1 (◇L Z D) = lem1 (D βγ (⊥L (S Z)))
-
-{-
-   ax4◇ : P at β :: (P ⊃ ◇ Q) at β :: [] ⇒ ◇ (◇ Q) ⊃ ◇ Q [ α ] → Void
-   ax4◇ (⊃L (S (S ())) _ _)
-   ax4◇ (⊥L (S (S ()))) 
-   ax4◇ (◇L (S (S ())) _)
-   ax4◇ (□L (S (S ())) _)
-   ax4◇ (⊃R (⊃L (S (S (S ()))) _ _))
-   ax4◇ (⊃R (⊥L (S (S (S ())))))
-   ax4◇ (⊃R (◇L (S (S (S ()))) _))
-   ax4◇ (⊃R (□L (S (S (S ()))) _))
-
-   ax4◇ (⊃R (◇R αβ D)) = {!!}
-
-   ax4◇ (⊃R (◇R αγ D)) = lem2 D
-    where
-      lem2 : ◇ (◇ Q) at α :: P at β :: (P ⊃ ◇ Q) at β :: [] ⇒ Q [ γ ] → Void
-      lem2 (hyp (S (S (S ()))))
-      lem2 (⊃L (S (S (S ()))) _ _)
-      lem2 (⊥L (S (S (S ())))) 
-      lem2 (◇L (S (S (S ()))) _)
-      lem2 (□L (S (S (S ()))) _)
-
-   ax4◇ (⊃R (◇L Z D)) = {!!} 
-   ax4◇ (⊃R D) = lem1 D
-    where
-      Γ = (◇ (◇ Q) at α :: P at β :: (P ⊃ ◇ Q) at β :: []) 
-
-      lem3 : ∀{s} 
-         → Seq β Γ [ ◇ (◇ Q) at α ] s Q 
-         → Void
-      lem3 (SEQUENT.hyp' (S (S (S ()))))
-      lem3 (SEQUENT.⊃L' (S (S Z)) D E) = {!!}
-      lem3 (SEQUENT.⊃L' (S (S (S ()))) _ _)
-      lem3 (SEQUENT.⊥L' (S (S (S ())))) 
-      lem3 (SEQUENT.◇L' (S (S (S ()))) _ _)
-      lem3 (SEQUENT.□L' (S (S (S ()))) _ _)
-
-      lem2 : Γ ⇒ Q [ γ ] → Void
-      lem2 (hyp (S (S (S ()))))
-      lem2 (⊃L (S (S (S ()))) _ _)
-      lem2 (⊥L (S (S (S ())))) 
-      lem2 (◇L (S (S (S ()))) _)
-      lem2 (□L (S (S (S ()))) _)
-
-      lem1 : Γ ⇒ ◇ Q [ α ] → Void
-      lem1 (⊃L (S (S (S ()))) _ _)
-      lem1 (⊥L (S (S (S ())))) 
-      lem1 (◇L (S (S (S ()))) _)
-      lem1 (□L (S (S (S ()))) _)
-      lem1 (◇R αγ D') = lem2 D' 
-      lem1 (◇L Z D) = lem1 (D αβ (nd→seq (⊃E (hyp (S (S Z))) (hyp (S Z)))))
-      lem1 (◇R αβ D') = lem3 (snd (→m refl D'))
-
-
-      -- s = fst (SEQUENT.→m refl  
-      lem3 : Seq β Γ Γ s Q
-
-⇒ Q [ β ] → Void
-      lem3 (hyp (S (S (S ()))))
-      lem3 (⊃L (S (S (S ()))) _ _)
-      lem3 (⊥L (S (S (S ())))) 
-      lem3 (◇L (S (S (S ()))) _)
-      lem3 (□L (S (S (S ()))) _)
-      lem3 (⊃L (S (S Z)) D E) = {!D!}
---       lem2 D = {!!} 
-      lem1 : ◇ (◇ Q) at α :: ◇ Q at β :: [] ⇒ ◇ Q [ α ] → Void
-      lem1 (⊃L (S (S ())) _ _)
-      lem1 (⊥L (S (S ()))) 
-      lem1 (◇R ω D) = {!!} -- lem2 (wk-seq (wkto ω) D)
-      lem1 (◇L Z D) = lem1 (D αβ {!!})
-      lem1 (◇L (S (S ())) _)
-      lem1 (□L (S (S ())) _)
-
-      lem2 : [ ◇ Q at β ] ⇒ Q [ β ] → Void
-      lem2 (hyp (S ()))
-      lem2 (⊃L (S ()) _ _)
-      lem2 (⊥L (S ())) 
-      lem2 (◇L (S ()) _)
-      lem2 (□L (S ()) _)
-      lem2 (◇L Z D) = lem2 (D βγ {!lem3!})
-
-      lem3 : [ ◇ Q at β ] ⇒ Q [ γ ] → Void
-      lem3 (hyp (S ()))
-      lem3 (⊃L (S ()) _ _)
-      lem3 (⊥L (S ())) 
-      lem3 (◇L (S ()) _)
-      lem3 (□L (S ()) _)
--}
 
    axIK : [] ⇒ (◇ Q ⊃ □ ⊥) ⊃ □ (Q ⊃ ⊥) [ β ] → Void
    axIK (⊃R (⊃L (S ()) D₁ D₂))
@@ -384,9 +277,6 @@ module NON-AXIOMS where
       lem1 (◇L (S ()) _)
       lem1 (□R D₁) = {!lem2 (D₁ βγ)!} -- lem2 (D₁ Z)
       lem1 (□L (S ()) _)
-
-
-
 
    ax¬◇ : [ Q at β ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ β ] → Void
    ax¬◇ (⊃R (⊃L (S (S ())) D₁ D₂))
