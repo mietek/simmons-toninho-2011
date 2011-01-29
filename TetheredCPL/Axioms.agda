@@ -351,9 +351,74 @@ module NON-AXIOMS where
       lem3 : ∀{Γ A w'} → β ≺ w' → ⊥ at γ ∈ Γ → Γ ⇒ A [ w' ]
       lem3 βγ x = ⊥L x
 
-   ax¬□ : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ α ] → Void
-   ax¬□ D = {!!}
+   ax¬□ : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ β ] → Void
+   ax¬□ (⊃R (⊃L (S ()) _ _))
+   ax¬□ (⊃R (⊥L (S ())))
+   ax¬□ (⊃R (◇R βγ (⊃R (⊃L (S (S ())) _ _))))
+   ax¬□ (⊃R (◇R βγ (⊃R (⊥L (S (S ()))))))
+   ax¬□ (⊃R (◇R βγ (⊃R (◇L (S (S ())) _))))
+   ax¬□ (⊃R (◇R βγ (⊃R (□L (S (S ())) _))))
+   ax¬□ (⊃R (◇R βγ (⊃L (S ()) _ _)))
+   ax¬□ (⊃R (◇R βγ (⊥L (S ()))))
+   ax¬□ (⊃R (◇R βγ (◇L (S ()) _)))
+   ax¬□ (⊃R (◇R βγ (□L (S ()) _)))
+   ax¬□ (⊃R (◇L (S ()) _))
+   ax¬□ (⊃R (□L (S ()) _))
+   ax¬□ (⊃L () _ _)
+   ax¬□ (⊥L ())
+   ax¬□ (◇L () _)
+   ax¬□ (□L () _)
+   ax¬□ (⊃R (⊃L Z D₁ _)) = lem1 D₁ -- lem1 D₁
+    where
+      lem2 : (¬ (□ Q) at β :: []) ⇒ Q [ γ ] → Void
+      lem2 (hyp (S ())) 
+      lem2 (⊃L (S ()) _ _)
+      lem2 (⊥L (S ()))
+      lem2 (◇L (S ()) _)
+      lem2 (□L (S ()) _) 
 
-   ax¬◇ : [ Q at α ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ α ] → Void
-   ax¬◇ D = {!!}
+      lem1 : ¬ (□ Q) at β :: [] ⇒ □ Q [ β ] → Void
+      lem1 (⊃L Z D₁ _) = lem1 D₁
+      lem1 (⊃L (S ()) _ _)
+      lem1 (⊥L (S ()))
+      lem1 (◇L (S ()) _)
+      lem1 (□R D₁) = {!lem2 (D₁ βγ)!} -- lem2 (D₁ Z)
+      lem1 (□L (S ()) _)
 
+
+
+
+   ax¬◇ : [ Q at β ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ β ] → Void
+   ax¬◇ (⊃R (⊃L (S (S ())) D₁ D₂))
+   ax¬◇ (⊃R (⊥L (S (S ()))))
+   ax¬◇ (⊃R (◇L (S (S ())) D₁))
+   ax¬◇ (⊃R (□L (S (S ())) D₁))
+   ax¬◇ (⊃L (S ()) D₁ D₂) 
+   ax¬◇ (⊥L (S ()))
+   ax¬◇ (◇L (S ()) D₁) 
+   ax¬◇ (□L (S ()) D₁) 
+   ax¬◇ (⊃R (□R D₁)) = lem (D₁ βγ)
+    where
+      lem : (◇ Q ⊃ ⊥) at β :: Q at β :: [] ⇒ Q ⊃ ⊥ [ γ ] → Void
+      lem (⊃R (⊃L (S (S (S ()))) D₁ D₂))
+      lem (⊃R (⊥L (S (S (S ())))))
+      lem (⊃R (◇L (S (S (S ()))) D₁))
+      lem (⊃R (□L (S (S (S ()))) D₁))
+      lem (⊃L (S (S ())) D₁ D₂)
+      lem (⊥L (S (S ())))
+      lem (◇L (S (S ())) D₁)
+      lem (□L (S (S ())) D₁)
+
+   ax¬◇ (⊃R (⊃L Z D₁ D₂)) = lem D₁
+    where
+      lem : ¬ (◇ Q) at β :: Q at β :: [] ⇒ ◇ Q [ β ] → Void
+      lem (⊃L Z D₁ D₂) = lem D₁
+      lem (⊃L (S (S ())) D₁ D₂)
+      lem (⊥L (S (S ())))
+      lem (◇R βγ (hyp (S (S ())))) 
+      lem (◇R βγ (⊃L (S (S ())) D₁ D₂))
+      lem (◇R βγ (⊥L (S (S ())))) 
+      lem (◇R βγ (◇L (S (S ())) D₁)) 
+      lem (◇R βγ (□L (S (S ())) D₁)) 
+      lem (◇L (S (S ())) D₁)
+      lem (□L (S (S ())) D₁) 
