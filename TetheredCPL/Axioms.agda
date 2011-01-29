@@ -275,7 +275,7 @@ module NON-AXIOMS where
       lem1 (⊃L (S ()) _ _)
       lem1 (⊥L (S ()))
       lem1 (◇L (S ()) _)
-      lem1 (□R D₁) = {!lem2 (D₁ βγ)!} -- lem2 (D₁ Z)
+      lem1 (□R D₁) = lem2 (D₁ βγ)
       lem1 (□L (S ()) _)
 
    ax¬◇ : [ Q at β ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ β ] → Void
