@@ -129,9 +129,6 @@ module NON-AXIOMS where
    Q : Type
    Q = a "Q"   
 
-   P : Type
-   P = a "P"   
-
  -- Axioms of IK, Simpson's intuitionistic modal logic (Theorem 3.3)
    ax◇⊥ : [ ⊥ at γ ] ⇒ ¬ (◇ ⊥) [ β ] → Void
    ax◇⊥ (⊃L (S ()) _ _) 
@@ -244,40 +241,6 @@ module NON-AXIOMS where
       lem3 : ∀{Γ A w'} → β ≺ w' → ⊥ at γ ∈ Γ → Γ ⇒ A [ w' ]
       lem3 βγ x = ⊥L x
 
-   ax¬□ : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ β ] → Void
-   ax¬□ (⊃R (⊃L (S ()) _ _))
-   ax¬□ (⊃R (⊥L (S ())))
-   ax¬□ (⊃R (◇R βγ (⊃R (⊃L (S (S ())) _ _))))
-   ax¬□ (⊃R (◇R βγ (⊃R (⊥L (S (S ()))))))
-   ax¬□ (⊃R (◇R βγ (⊃R (◇L (S (S ())) _))))
-   ax¬□ (⊃R (◇R βγ (⊃R (□L (S (S ())) _))))
-   ax¬□ (⊃R (◇R βγ (⊃L (S ()) _ _)))
-   ax¬□ (⊃R (◇R βγ (⊥L (S ()))))
-   ax¬□ (⊃R (◇R βγ (◇L (S ()) _)))
-   ax¬□ (⊃R (◇R βγ (□L (S ()) _)))
-   ax¬□ (⊃R (◇L (S ()) _))
-   ax¬□ (⊃R (□L (S ()) _))
-   ax¬□ (⊃L () _ _)
-   ax¬□ (⊥L ())
-   ax¬□ (◇L () _)
-   ax¬□ (□L () _)
-   ax¬□ (⊃R (⊃L Z D₁ _)) = lem1 D₁ -- lem1 D₁
-    where
-      lem2 : (¬ (□ Q) at β :: []) ⇒ Q [ γ ] → Void
-      lem2 (hyp (S ())) 
-      lem2 (⊃L (S ()) _ _)
-      lem2 (⊥L (S ()))
-      lem2 (◇L (S ()) _)
-      lem2 (□L (S ()) _) 
-
-      lem1 : ¬ (□ Q) at β :: [] ⇒ □ Q [ β ] → Void
-      lem1 (⊃L Z D₁ _) = lem1 D₁
-      lem1 (⊃L (S ()) _ _)
-      lem1 (⊥L (S ()))
-      lem1 (◇L (S ()) _)
-      lem1 (□R D₁) = lem2 (D₁ βγ)
-      lem1 (□L (S ()) _)
-
    ax¬◇ : [ Q at β ] ⇒ ¬ (◇ Q) ⊃ □ (¬ Q) [ β ] → Void
    ax¬◇ (⊃R (⊃L (S (S ())) D₁ D₂))
    ax¬◇ (⊃R (⊥L (S (S ()))))
@@ -312,3 +275,38 @@ module NON-AXIOMS where
       lem (◇R βγ (□L (S (S ())) D₁)) 
       lem (◇L (S (S ())) D₁)
       lem (□L (S (S ())) D₁) 
+
+   ax¬□ : [] ⇒ ¬ (□ Q) ⊃ ◇ (¬ Q) [ β ] → Void
+   ax¬□ (⊃R (⊃L (S ()) _ _))
+   ax¬□ (⊃R (⊥L (S ())))
+   ax¬□ (⊃R (◇R βγ (⊃R (⊃L (S (S ())) _ _))))
+   ax¬□ (⊃R (◇R βγ (⊃R (⊥L (S (S ()))))))
+   ax¬□ (⊃R (◇R βγ (⊃R (◇L (S (S ())) _))))
+   ax¬□ (⊃R (◇R βγ (⊃R (□L (S (S ())) _))))
+   ax¬□ (⊃R (◇R βγ (⊃L (S ()) _ _)))
+   ax¬□ (⊃R (◇R βγ (⊥L (S ()))))
+   ax¬□ (⊃R (◇R βγ (◇L (S ()) _)))
+   ax¬□ (⊃R (◇R βγ (□L (S ()) _)))
+   ax¬□ (⊃R (◇L (S ()) _))
+   ax¬□ (⊃R (□L (S ()) _))
+   ax¬□ (⊃L () _ _)
+   ax¬□ (⊥L ())
+   ax¬□ (◇L () _)
+   ax¬□ (□L () _)
+   ax¬□ (⊃R (⊃L Z D₁ _)) = lem1 D₁ -- lem1 D₁
+    where
+      lem2 : (¬ (□ Q) at β :: []) ⇒ Q [ γ ] → Void
+      lem2 (hyp (S ())) 
+      lem2 (⊃L (S ()) _ _)
+      lem2 (⊥L (S ()))
+      lem2 (◇L (S ()) _)
+      lem2 (□L (S ()) _) 
+
+      lem1 : ¬ (□ Q) at β :: [] ⇒ □ Q [ β ] → Void
+      lem1 (⊃L Z D₁ _) = lem1 D₁
+      lem1 (⊃L (S ()) _ _)
+      lem1 (⊥L (S ()))
+      lem1 (◇L (S ()) _)
+      lem1 (□R D₁) = lem2 (D₁ βγ)
+      lem1 (□L (S ()) _)
+
